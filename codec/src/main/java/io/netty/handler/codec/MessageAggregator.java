@@ -203,6 +203,50 @@ public abstract class MessageAggregator<I, S, C extends ByteBufHolder, O extends
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (super.acceptInboundMessage(msg)) {
+            I cast = (I) msg;
+            if (isAggregated(cast)) {
+                handleAggregated(cast);
+            }
+        }
+        super.channelRead(ctx, msg);
+    }
+
+    private void handleAggregated(I msg) throws Exception {
+        handleAggregatedStart((S) msg);
+        finishAggregation((O) msg);
+    }
+
+    private void handleAggregatedStart(S msg) throws Exception {
+        Object continueResponse = newContinueResponse(msg, maxContentLength, ctx.pipeline());
+        if (continueResponse != null) {
+            ChannelFutureListener listener = continueResponseWriteListener();
+            boolean closeAfterWrite = closeAfterContinueResponse(continueResponse);
+            final ChannelFuture future = ctx.writeAndFlush(continueResponse).addListener(listener);
+            if (closeAfterWrite) {
+                future.addListener(ChannelFutureListener.CLOSE);
+            }
+        }
+    }
+
+    private ChannelFutureListener continueResponseWriteListener() {
+        // Cache the write listener for reuse.
+        ChannelFutureListener listener = continueResponseWriteListener;
+        if (listener == null) {
+            continueResponseWriteListener = listener = new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (!future.isSuccess()) {
+                        ctx.fireExceptionCaught(future.cause());
+                    }
+                }
+            };
+        }
+        return listener;
+    }
+
+    @Override
     protected void decode(final ChannelHandlerContext ctx, I msg, List<Object> out) throws Exception {
         if (isStartMessage(msg)) {
             aggregating = true;
@@ -220,18 +264,7 @@ public abstract class MessageAggregator<I, S, C extends ByteBufHolder, O extends
             // Check before content length. Failing an expectation may result in a different response being sent.
             Object continueResponse = newContinueResponse(m, maxContentLength, ctx.pipeline());
             if (continueResponse != null) {
-                // Cache the write listener for reuse.
-                ChannelFutureListener listener = continueResponseWriteListener;
-                if (listener == null) {
-                    continueResponseWriteListener = listener = new ChannelFutureListener() {
-                        @Override
-                        public void operationComplete(ChannelFuture future) throws Exception {
-                            if (!future.isSuccess()) {
-                                ctx.fireExceptionCaught(future.cause());
-                            }
-                        }
-                    };
-                }
+                ChannelFutureListener listener = continueResponseWriteListener();
 
                 // Make sure to call this before writing, otherwise reference counts may be invalid.
                 boolean closeAfterWrite = closeAfterContinueResponse(continueResponse);

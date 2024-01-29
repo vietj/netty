@@ -246,6 +246,22 @@ public class HttpServerUpgradeHandler extends HttpObjectAggregator {
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof FullHttpRequest) {
+            FullHttpRequest fullRequest = (FullHttpRequest) msg;
+            if (fullRequest.headers().contains(HttpHeaderNames.UPGRADE) &&
+                    shouldHandleUpgradeRequest(fullRequest)) {
+                if (upgrade(ctx, fullRequest)) {
+                    // The upgrade was successful, do not propagated to the next handler. This request will
+                    // be propagated as a user event instead.
+                    return;
+                }
+            }
+        }
+        super.channelRead(ctx, msg);
+    }
+
+    @Override
     protected void decode(ChannelHandlerContext ctx, HttpObject msg, List<Object> out)
             throws Exception {
 
