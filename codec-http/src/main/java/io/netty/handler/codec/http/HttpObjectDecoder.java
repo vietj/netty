@@ -356,7 +356,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             return;
         }
         case READ_HEADER: try {
-            State nextState = readHeaders(buffer);
+            final State nextState = readHeaders(buffer);
             if (nextState == null) {
                 return;
             }
@@ -377,20 +377,6 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
                 out.add(message);
                 return;
             default:
-                /*
-                 * RFC 7230, 3.3.3 (https://tools.ietf.org/html/rfc7230#section-3.3.3) states that if a
-                 * request does not have either a transfer-encoding or a content-length header then the message body
-                 * length is 0. However, for a response the body length is the number of octets received prior to the
-                 * server closing the connection. So we treat this as variable length chunked encoding.
-                 */
-                long contentLength = contentLength();
-                if (contentLength == 0 || contentLength == -1 && isDecodingRequest()) {
-                    out.add(message);
-                    out.add(LastHttpContent.EMPTY_LAST_CONTENT);
-                    resetNow();
-                    return;
-                }
-
                 assert nextState == State.READ_FIXED_LENGTH_CONTENT ||
                         nextState == State.READ_VARIABLE_LENGTH_CONTENT;
 
@@ -773,10 +759,21 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
                 handleTransferEncodingChunkedWithContentLength(message);
             }
             return State.READ_CHUNK_SIZE;
-        } else if (contentLength() >= 0) {
-            return State.READ_FIXED_LENGTH_CONTENT;
         } else {
-            return State.READ_VARIABLE_LENGTH_CONTENT;
+            long contentLength = contentLength();
+            if (contentLength == 0) {
+                return State.SKIP_CONTROL_CHARS;
+            } else if (contentLength == -1) {
+                /*
+                 * RFC 7230, 3.3.3 (https://tools.ietf.org/html/rfc7230#section-3.3.3) states that if a
+                 * request does not have either a transfer-encoding or a content-length header then the message body
+                 * length is 0. However, for a response the body length is the number of octets received prior to the
+                 * server closing the connection. So we treat this as variable length chunked encoding.
+                 */
+                return isDecodingRequest() ? State.SKIP_CONTROL_CHARS : State.READ_VARIABLE_LENGTH_CONTENT;
+            } else {
+                return State.READ_FIXED_LENGTH_CONTENT;
+            }
         }
     }
 
