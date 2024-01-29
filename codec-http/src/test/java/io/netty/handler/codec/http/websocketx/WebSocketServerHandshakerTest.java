@@ -35,6 +35,7 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.CharsetUtil;
 import org.junit.jupiter.api.Test;
@@ -167,12 +168,18 @@ public abstract class WebSocketServerHandshakerTest {
         assertEquals(SWITCHING_PROTOCOLS, response.status());
         assertTrue(response.headers().containsValue(HttpHeaderNames.UPGRADE, HttpHeaderValues.WEBSOCKET, true));
 
-        LastHttpContent lastHttpContent = channel.readInbound();
-        if (webSocketVersion() != WebSocketVersion.V00) {
-            assertEquals(LastHttpContent.EMPTY_LAST_CONTENT, lastHttpContent);
+        HttpContent content;
+        if (response instanceof FullHttpResponse) {
+            content = (HttpContent) response;
         } else {
-            assertEquals("8jKS'y:G*Co,Wxa-", lastHttpContent.content().toString(CharsetUtil.US_ASCII));
-            assertTrue(lastHttpContent.release());
+            content = channel.readInbound();
+        }
+
+        if (webSocketVersion() != WebSocketVersion.V00) {
+            assertEquals(0, content.content().readableBytes());
+        } else {
+            assertEquals("8jKS'y:G*Co,Wxa-", content.content().toString(CharsetUtil.US_ASCII));
+            assertTrue(content.release());
         }
 
         assertFalse(channel.finish());

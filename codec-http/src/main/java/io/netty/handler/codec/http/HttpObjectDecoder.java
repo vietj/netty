@@ -363,18 +363,19 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             final State nextState = readHeaders(buffer);
             if (nextState == null) {
                 return;
+            } else if (nextState == State.SKIP_CONTROL_CHARS) {
+                // fast-path
+                // No content is expected.
+
+                out.add(createInitialMessage(true));
+                resetNow();
+                return;
             }
-            HttpMessage message = createInitialMessage();
+
+            HttpMessage message = createInitialMessage(false);
             currentState = nextState;
             this.message = message;
             switch (nextState) {
-            case SKIP_CONTROL_CHARS:
-                // fast-path
-                // No content is expected.
-                out.add(message);
-                out.add(LastHttpContent.EMPTY_LAST_CONTENT);
-                resetNow();
-                return;
             case READ_CHUNK_SIZE:
                 if (!chunkedSupported) {
                     throw new IllegalArgumentException("Chunked messages not supported");
@@ -674,7 +675,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         in.skipBytes(in.readableBytes());
 
         if (state == State.READ_HEADER) {
-            message = createMessage(version, headers);
+            message = createMessage(version, headers, false);
         } else if (message == null) {
             message = createInvalidMessage();
         }
@@ -699,8 +700,8 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         return chunk;
     }
 
-    private HttpMessage createInitialMessage() {
-        HttpMessage msg = createMessage(version, headers);
+    private HttpMessage createInitialMessage(boolean full) {
+        HttpMessage msg = createMessage(version, headers, full);
         // Done parsing initial line and headers. Set decoder result.
         HttpMessageDecoderResult decoderResult = new HttpMessageDecoderResult(lineParser.size, headerParser.size);
         msg.setDecoderResult(decoderResult);
@@ -900,7 +901,7 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
 
     protected abstract boolean isDecodingRequest();
     protected abstract HttpVersion setInitialLine(String[] initialLine) throws Exception;
-    protected abstract HttpMessage createMessage(HttpVersion version, HttpHeaders headers);
+    protected abstract HttpMessage createMessage(HttpVersion version, HttpHeaders headers, boolean full);
     protected abstract HttpMessage createMessage(String[] initialLine) throws Exception;
     protected abstract HttpMessage createInvalidMessage();
 

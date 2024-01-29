@@ -19,6 +19,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelPipeline;
 
+import static io.netty.handler.codec.http.DefaultHttpHeadersFactory.trailersFactory;
+
 /**
  * Decodes {@link ByteBuf}s into {@link HttpResponse}s and
  * {@link HttpContent}s.
@@ -213,8 +215,13 @@ public class HttpResponseDecoder extends HttpObjectDecoder {
     }
 
     @Override
-    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
-        return new DefaultHttpResponse(version, responseStatus, headers);
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers, boolean full) {
+        if (full) {
+            return new DefaultFullHttpResponse(version, responseStatus, Unpooled.EMPTY_BUFFER,
+                    headers, trailersFactory().newHeaders());
+        } else {
+            return new DefaultHttpResponse(version, responseStatus, headers);
+        }
     }
 
     @Override

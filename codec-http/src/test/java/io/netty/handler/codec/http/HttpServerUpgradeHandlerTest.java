@@ -180,10 +180,9 @@ public class HttpServerUpgradeHandlerTest {
         assertNull(channel.pipeline().get("marker"));
 
         HttpRequest req = channel.readInbound();
-        assertThat(req).isNotInstanceOf(FullHttpRequest.class); // Should not be aggregated.
+        assertThat(req).isInstanceOf(FullHttpRequest.class);
         assertTrue(req.headers().contains(HttpHeaderNames.CONNECTION, "Upgrade", false));
         assertTrue(req.headers().contains(HttpHeaderNames.UPGRADE, "do-not-upgrade", false));
-        assertTrue(channel.readInbound() instanceof LastHttpContent);
         assertNull(channel.readInbound());
 
         // No response should be written because we're just passing through.

@@ -346,13 +346,12 @@ public class HttpClientCodecTest {
         EmbeddedChannel ch = new EmbeddedChannel(new HttpClientCodec());
         assertTrue(ch.writeInbound(Unpooled.wrappedBuffer(data)));
 
-        HttpResponse res = ch.readInbound();
+        FullHttpResponse res = ch.readInbound();
         assertThat(res.protocolVersion(), sameInstance(HttpVersion.HTTP_1_1));
         assertThat(res.status(), is(HttpResponseStatus.PROCESSING));
-        HttpContent content = ch.readInbound();
         // HTTP 102 is not allowed to have content.
-        assertThat(content.content().readableBytes(), is(0));
-        content.release();
+        assertThat(res.content().readableBytes(), is(0));
+        res.release();
 
         assertThat(ch.finish(), is(false));
     }
@@ -372,14 +371,13 @@ public class HttpClientCodecTest {
         buffer.release();
         assertNull(ch.readOutbound());
         assertTrue(ch.writeInbound(Unpooled.wrappedBuffer(data)));
-        HttpResponse res = ch.readInbound();
+        FullHttpResponse res = ch.readInbound();
         assertThat(res.protocolVersion(), sameInstance(HttpVersion.HTTP_1_1));
         assertThat(res.status(), is(HttpResponseStatus.PROCESSING));
-        HttpContent content = ch.readInbound();
         // HTTP 102 is not allowed to have content.
-        assertThat(content.content().readableBytes(), is(0));
-        assertThat(content, instanceOf(LastHttpContent.class));
-        content.release();
+        assertThat(res.content().readableBytes(), is(0));
+        assertThat(res, instanceOf(LastHttpContent.class));
+        res.release();
 
         assertTrue(ch.writeOutbound(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")));
         buffer = ch.readOutbound();
@@ -387,10 +385,10 @@ public class HttpClientCodecTest {
         assertNull(ch.readOutbound());
         assertTrue(ch.writeInbound(Unpooled.wrappedBuffer(data2)));
 
-        res = ch.readInbound();
-        assertThat(res.protocolVersion(), sameInstance(HttpVersion.HTTP_1_1));
-        assertThat(res.status(), is(HttpResponseStatus.OK));
-        content = ch.readInbound();
+        HttpResponse res2 = ch.readInbound();
+        assertThat(res2.protocolVersion(), sameInstance(HttpVersion.HTTP_1_1));
+        assertThat(res2.status(), is(HttpResponseStatus.OK));
+        HttpContent content = ch.readInbound();
         // HTTP 200 has content.
         assertThat(content.content().readableBytes(), is(8));
         assertThat(content, instanceOf(LastHttpContent.class));

@@ -204,12 +204,9 @@ public class HttpRequestDecoderTest {
                 "\t            newLinePart22"
                 + crlf + crlf;
         assertTrue(channel.writeInbound(Unpooled.copiedBuffer(request, CharsetUtil.US_ASCII)));
-        HttpRequest req = channel.readInbound();
+        FullHttpRequest req = channel.readInbound();
         assertEquals("part1 newLinePart2", req.headers().get(of("MyTestHeader")));
         assertEquals("part21 newLinePart22", req.headers().get(of("MyTestHeader2")));
-
-        LastHttpContent c = channel.readInbound();
-        c.release();
 
         assertFalse(channel.finish());
         assertNull(channel.readInbound());
@@ -245,8 +242,7 @@ public class HttpRequestDecoderTest {
 
         String query = "GET /max-file-size HTTP/1.1\r\n\r\n";
         channel.writeInbound(Unpooled.copiedBuffer(query, CharsetUtil.US_ASCII));
-        assertThat(channel.readInbound(), is(instanceOf(HttpRequest.class)));
-        assertThat(channel.readInbound(), is(instanceOf(LastHttpContent.class)));
+        assertThat(channel.readInbound(), is(instanceOf(FullHttpRequest.class)));
 
         assertThat(channel.finish(), is(false));
     }
@@ -275,8 +271,7 @@ public class HttpRequestDecoderTest {
 
         String query = "GET /max-file-size HTTP/1.1\r\n\r\n";
         channel.writeInbound(Unpooled.copiedBuffer(query, CharsetUtil.US_ASCII));
-        assertThat(channel.readInbound(), is(instanceOf(HttpRequest.class)));
-        assertThat(channel.readInbound(), is(instanceOf(LastHttpContent.class)));
+        assertThat(channel.readInbound(), is(instanceOf(FullHttpRequest.class)));
 
         assertThat(channel.finish(), is(false));
     }
@@ -292,13 +287,11 @@ public class HttpRequestDecoderTest {
         String str2 = "t: localhost2" + crlf +
                 "content-length: 0" + crlf + crlf;
         channel.writeInbound(Unpooled.copiedBuffer(str1, CharsetUtil.US_ASCII));
-        HttpRequest req = channel.readInbound();
+        FullHttpRequest req = channel.readInbound();
         assertEquals(HttpVersion.HTTP_1_1, req.protocolVersion());
         assertEquals("/some/path", req.uri());
         assertEquals(1, req.headers().size());
         assertTrue(AsciiString.contentEqualsIgnoreCase("localhost1", req.headers().get(HOST)));
-        LastHttpContent cnt = channel.readInbound();
-        cnt.release();
 
         channel.writeInbound(Unpooled.copiedBuffer(str2, CharsetUtil.US_ASCII));
         req = channel.readInbound();
@@ -307,8 +300,6 @@ public class HttpRequestDecoderTest {
         assertEquals(2, req.headers().size());
         assertTrue(AsciiString.contentEqualsIgnoreCase("localhost2", req.headers().get(HOST)));
         assertTrue(AsciiString.contentEqualsIgnoreCase("0", req.headers().get(HttpHeaderNames.CONTENT_LENGTH)));
-        cnt = channel.readInbound();
-        cnt.release();
         assertFalse(channel.finishAndReleaseAll());
     }
 
@@ -358,7 +349,7 @@ public class HttpRequestDecoderTest {
         assertEquals(HttpMethod.GET, req.method());
         assertEquals("/some/path", req.uri());
         assertEquals(HttpVersion.HTTP_1_1, req.protocolVersion());
-        assertTrue(channel.finishAndReleaseAll());
+        assertFalse(channel.finishAndReleaseAll());
     }
 
     @Test
@@ -626,7 +617,7 @@ public class HttpRequestDecoderTest {
         EmbeddedChannel channel = new EmbeddedChannel(decoder);
 
         assertTrue(channel.writeInbound(Unpooled.copiedBuffer(requestStr, CharsetUtil.US_ASCII)));
-        HttpRequest request = channel.readInbound();
+        FullHttpRequest request = channel.readInbound();
         assertTrue(request.decoderResult().isSuccess());
         HttpHeaders headers = request.headers();
         assertEquals("example.com", headers.get("Host"));
@@ -634,9 +625,6 @@ public class HttpRequestDecoderTest {
         assertEquals("x1", headers.get("X-1-Header"));
         assertEquals("x2", headers.get("X-2-Header"));
         assertEquals("x3", headers.get("X-3-Header"));
-        LastHttpContent last = channel.readInbound();
-        assertEquals(LastHttpContent.EMPTY_LAST_CONTENT, last);
-        last.release();
         assertFalse(channel.finish());
     }
 

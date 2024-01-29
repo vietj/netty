@@ -20,6 +20,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.AsciiString;
 
+import static io.netty.handler.codec.http.DefaultHttpHeadersFactory.trailersFactory;
+
 /**
  * Decodes {@link ByteBuf}s into {@link HttpRequest}s and {@link HttpContent}s.
  *
@@ -212,8 +214,13 @@ public class HttpRequestDecoder extends HttpObjectDecoder {
     }
 
     @Override
-    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
-        return new DefaultHttpRequest(version, httpMethod, uri, headers);
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers, boolean full) {
+        if (full) {
+            return new DefaultFullHttpRequest(version, httpMethod, uri, Unpooled.EMPTY_BUFFER,
+                    headers, trailersFactory().newHeaders());
+        } else {
+            return new DefaultHttpRequest(version, httpMethod, uri, headers);
+        }
     }
 
     @Override

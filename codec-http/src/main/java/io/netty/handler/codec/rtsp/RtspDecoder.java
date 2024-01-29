@@ -149,7 +149,7 @@ public class RtspDecoder extends HttpObjectDecoder {
     }
 
     @Override
-    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers, boolean full) {
         throw new UnsupportedOperationException();
     }
 
