@@ -190,6 +190,32 @@ public class HttpRequestDecoder extends HttpObjectDecoder {
         super(config);
     }
 
+    private HttpMethod httpMethod;
+    private String uri;
+
+    @Override
+    protected HttpVersion setInitialLine(String[] initialLine) throws Exception {
+        httpMethod = HttpMethod.valueOf(initialLine[0]);
+        uri = initialLine[1];
+        return HttpVersion.valueOf(initialLine[2]);
+    }
+
+    @Override
+    protected long getContentLength(HttpHeaders headers) {
+        long contentLength = super.getContentLength(headers);
+        if (contentLength == -1L && HttpMethod.GET.equals(httpMethod) &&
+                headers.contains(HttpHeaderNames.SEC_WEBSOCKET_KEY1) &&
+                headers.contains(HttpHeaderNames.SEC_WEBSOCKET_KEY2)) {
+            return 8;
+        }
+        return contentLength;
+    }
+
+    @Override
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
+        return new DefaultHttpRequest(version, httpMethod, uri, headers);
+    }
+
     @Override
     protected HttpMessage createMessage(String[] initialLine) throws Exception {
         return new DefaultHttpRequest(
@@ -344,6 +370,11 @@ public class HttpRequestDecoder extends HttpObjectDecoder {
     @Override
     protected boolean isDecodingRequest() {
         return true;
+    }
+
+    @Override
+    protected boolean isContentAlwaysEmpty(HttpHeaders headers) {
+        return false;
     }
 
     @Override

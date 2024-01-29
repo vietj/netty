@@ -167,6 +167,9 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
     private final LineParser lineParser;
 
     private HttpMessage message;
+    private HttpVersion version;
+    private HttpHeaders headers;
+    private HttpMessageDecoderResult initialMessageResult;
     private long chunkSize;
     private long contentLength = Long.MIN_VALUE;
     private final AtomicBoolean resetRequested = new AtomicBoolean();
@@ -348,8 +351,9 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             final String[] initialLine = splitInitialLine(line);
             assert initialLine.length == 3 : "initialLine::length must be 3";
 
-            message = createMessage(initialLine);
+            version = setInitialLine(initialLine);
             currentState = State.READ_HEADER;
+            headers = headersFactory.newHeaders();
             // fall-through
         } catch (Exception e) {
             out.add(invalidMessage(buffer, e));
@@ -360,7 +364,9 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             if (nextState == null) {
                 return;
             }
+            HttpMessage message = createInitialMessage();
             currentState = nextState;
+            this.message = message;
             switch (nextState) {
             case SKIP_CONTROL_CHARS:
                 // fast-path
@@ -583,30 +589,35 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         super.userEventTriggered(ctx, evt);
     }
 
-    protected boolean isContentAlwaysEmpty(HttpMessage msg) {
-        if (msg instanceof HttpResponse) {
-            HttpResponse res = (HttpResponse) msg;
-            final HttpResponseStatus status = res.status();
-            final int code = status.code();
-            final HttpStatusClass statusClass = status.codeClass();
+    protected abstract boolean isContentAlwaysEmpty(HttpHeaders headers);
 
-            // Correctly handle return codes of 1xx.
-            //
-            // See:
-            //     - https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html Section 4.4
-            //     - https://github.com/netty/netty/issues/222
-            if (statusClass == HttpStatusClass.INFORMATIONAL) {
-                // One exception: Hixie 76 websocket handshake response
-                return !(code == 101 && !res.headers().contains(HttpHeaderNames.SEC_WEBSOCKET_ACCEPT)
-                         && res.headers().contains(HttpHeaderNames.UPGRADE, HttpHeaderValues.WEBSOCKET, true));
-            }
+    protected boolean isContentAlwaysEmpty(HttpHeaders headers, HttpResponseStatus status) {
+        final int code = status.code();
+        final HttpStatusClass statusClass = status.codeClass();
 
-            switch (code) {
+        // Correctly handle return codes of 1xx.
+        //
+        // See:
+        //     - https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html Section 4.4
+        //     - https://github.com/netty/netty/issues/222
+        if (statusClass == HttpStatusClass.INFORMATIONAL) {
+            // One exception: Hixie 76 websocket handshake response
+            return !(code == 101 && !headers.contains(HttpHeaderNames.SEC_WEBSOCKET_ACCEPT)
+                    && headers.contains(HttpHeaderNames.UPGRADE, HttpHeaderValues.WEBSOCKET, true));
+        }
+
+        switch (code) {
             case 204: case 304:
                 return true;
             default:
                 return false;
-            }
+        }
+    }
+
+    protected boolean isContentAlwaysEmpty(HttpMessage msg) {
+        if (msg instanceof HttpResponse) {
+            HttpResponse res = (HttpResponse) msg;
+            return isContentAlwaysEmpty(res.headers(), res.status());
         }
         return false;
     }
@@ -655,13 +666,16 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
     }
 
     private HttpMessage invalidMessage(ByteBuf in, Exception cause) {
+        State state = currentState;
         currentState = State.BAD_MESSAGE;
 
         // Advance the readerIndex so that ByteToMessageDecoder does not complain
         // when we produced an invalid message without consuming anything.
         in.skipBytes(in.readableBytes());
 
-        if (message == null) {
+        if (state == State.READ_HEADER) {
+            message = createMessage(version, headers);
+        } else if (message == null) {
             message = createInvalidMessage();
         }
         message.setDecoderResult(DecoderResult.failure(cause));
@@ -685,9 +699,16 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         return chunk;
     }
 
+    private HttpMessage createInitialMessage() {
+        HttpMessage msg = createMessage(version, headers);
+        // Done parsing initial line and headers. Set decoder result.
+        HttpMessageDecoderResult decoderResult = new HttpMessageDecoderResult(lineParser.size, headerParser.size);
+        msg.setDecoderResult(decoderResult);
+        return msg;
+    }
+
     private State readHeaders(ByteBuf buffer) {
-        final HttpMessage message = this.message;
-        final HttpHeaders headers = message.headers();
+        final HttpHeaders headers = this.headers;
 
         final HeaderParser headerParser = this.headerParser;
 
@@ -729,13 +750,9 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
         name = null;
         value = null;
 
-        // Done parsing initial line and headers. Set decoder result.
-        HttpMessageDecoderResult decoderResult = new HttpMessageDecoderResult(lineParser.size, headerParser.size);
-        message.setDecoderResult(decoderResult);
-
         List<String> contentLengthFields = headers.getAll(HttpHeaderNames.CONTENT_LENGTH);
         if (!contentLengthFields.isEmpty()) {
-            HttpVersion version = message.protocolVersion();
+            HttpVersion version = this.version;
             boolean isHttp10OrEarlier = version.majorVersion() < 1 || (version.majorVersion() == 1
                     && version.minorVersion() == 0);
             // Guard against multiple Content-Length headers as stated in
@@ -751,12 +768,15 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
             }
         }
 
-        if (isContentAlwaysEmpty(message)) {
-            HttpUtil.setTransferEncodingChunked(message, false);
+        // Done parsing initial line and headers. Set decoder result.
+        initialMessageResult = new HttpMessageDecoderResult(lineParser.size, headerParser.size);
+
+        if (isContentAlwaysEmpty(headers)) {
+            HttpUtil.setTransferEncodingChunked(headers, false);
             return State.SKIP_CONTROL_CHARS;
-        } else if (HttpUtil.isTransferEncodingChunked(message)) {
-            if (!contentLengthFields.isEmpty() && message.protocolVersion() == HttpVersion.HTTP_1_1) {
-                handleTransferEncodingChunkedWithContentLength(message);
+        } else if (HttpUtil.isTransferEncodingChunked(headers)) {
+            if (!contentLengthFields.isEmpty() && version == HttpVersion.HTTP_1_1) {
+                handleTransferEncodingChunkedWithContentLength(headers);
             }
             return State.READ_CHUNK_SIZE;
         } else {
@@ -799,15 +819,27 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
      * src/http/ngx_http_request.c#L1946-L1953
      */
     protected void handleTransferEncodingChunkedWithContentLength(HttpMessage message) {
-        message.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
+        handleTransferEncodingChunkedWithContentLength(message.headers());
+    }
+
+    protected void handleTransferEncodingChunkedWithContentLength(HttpHeaders headers) {
+        headers.remove(HttpHeaderNames.CONTENT_LENGTH);
         contentLength = Long.MIN_VALUE;
     }
 
     private long contentLength() {
         if (contentLength == Long.MIN_VALUE) {
-            contentLength = HttpUtil.getContentLength(message, -1L);
+            contentLength = getContentLength(headers);
         }
         return contentLength;
+    }
+
+    protected long getContentLength(HttpHeaders headers) {
+        String value = headers.get(HttpHeaderNames.CONTENT_LENGTH);
+        if (value != null) {
+            return Long.parseLong(value);
+        }
+        return -1L;
     }
 
     private LastHttpContent readTrailingHeaders(ByteBuf buffer) {
@@ -867,6 +899,8 @@ public abstract class HttpObjectDecoder extends ByteToMessageDecoder {
     }
 
     protected abstract boolean isDecodingRequest();
+    protected abstract HttpVersion setInitialLine(String[] initialLine) throws Exception;
+    protected abstract HttpMessage createMessage(HttpVersion version, HttpHeaders headers);
     protected abstract HttpMessage createMessage(String[] initialLine) throws Exception;
     protected abstract HttpMessage createInvalidMessage();
 

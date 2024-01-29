@@ -974,11 +974,7 @@ public class HttpResponseDecoderTest {
         String responseInitialLine =
                 "HTTP/1.1 200 OK\r\n";
         assertFalse(channel.writeInbound(Unpooled.copiedBuffer(responseInitialLine, CharsetUtil.US_ASCII)));
-        assertTrue(channel.finish());
-        HttpMessage message = channel.readInbound();
-        assertTrue(message.decoderResult().isFailure());
-        assertThat(message.decoderResult().cause(), instanceOf(PrematureChannelClosureException.class));
-        assertNull(channel.readInbound());
+        assertFalse(channel.finish());
     }
 
     @Test

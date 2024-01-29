@@ -322,6 +322,16 @@ public final class HttpUtil {
     }
 
     /**
+     * Checks to see if the transfer encoding in a specified {@link HttpHeaders} is chunked
+     *
+     * @param headers The headers to check
+     * @return True if transfer encoding is chunked, otherwise false
+     */
+    public static boolean isTransferEncodingChunked(HttpHeaders headers) {
+        return headers.containsValue(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED, true);
+    }
+
+    /**
      * Set the {@link HttpHeaderNames#TRANSFER_ENCODING} to either include {@link HttpHeaderValues#CHUNKED} if
      * {@code chunked} is {@code true}, or remove {@link HttpHeaderValues#CHUNKED} if {@code chunked} is {@code false}.
      *
@@ -330,11 +340,23 @@ public final class HttpUtil {
      * {@link HttpHeaderValues#CHUNKED} from the headers.
      */
     public static void setTransferEncodingChunked(HttpMessage m, boolean chunked) {
+        setTransferEncodingChunked(m.headers(), chunked);
+    }
+
+    /**
+     * Set the {@link HttpHeaderNames#TRANSFER_ENCODING} to either include {@link HttpHeaderValues#CHUNKED} if
+     * {@code chunked} is {@code true}, or remove {@link HttpHeaderValues#CHUNKED} if {@code chunked} is {@code false}.
+     *
+     * @param headers The  headers to modify.
+     * @param chunked if {@code true} then include {@link HttpHeaderValues#CHUNKED} in the headers. otherwise remove
+     * {@link HttpHeaderValues#CHUNKED} from the headers.
+     */
+    public static void setTransferEncodingChunked(HttpHeaders headers, boolean chunked) {
         if (chunked) {
-            m.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
-            m.headers().remove(HttpHeaderNames.CONTENT_LENGTH);
+            headers.set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+            headers.remove(HttpHeaderNames.CONTENT_LENGTH);
         } else {
-            List<String> encodings = m.headers().getAll(HttpHeaderNames.TRANSFER_ENCODING);
+            List<String> encodings = headers.getAll(HttpHeaderNames.TRANSFER_ENCODING);
             if (encodings.isEmpty()) {
                 return;
             }
@@ -347,9 +369,9 @@ public final class HttpUtil {
                 }
             }
             if (values.isEmpty()) {
-                m.headers().remove(HttpHeaderNames.TRANSFER_ENCODING);
+                headers.remove(HttpHeaderNames.TRANSFER_ENCODING);
             } else {
-                m.headers().set(HttpHeaderNames.TRANSFER_ENCODING, values);
+                headers.set(HttpHeaderNames.TRANSFER_ENCODING, values);
             }
         }
     }

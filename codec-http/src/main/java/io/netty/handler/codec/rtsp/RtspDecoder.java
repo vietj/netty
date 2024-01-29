@@ -24,6 +24,8 @@ import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpDecoderConfig;
 import io.netty.handler.codec.http.HttpMessage;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.HttpObjectDecoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -134,6 +136,21 @@ public class RtspDecoder extends HttpObjectDecoder {
         super(config.clone()
                 .setMaxChunkSize(2 * config.getMaxChunkSize())
                 .setChunkedSupported(false));
+    }
+
+    @Override
+    protected boolean isContentAlwaysEmpty(HttpHeaders headers) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected HttpVersion setInitialLine(String[] initialLine) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

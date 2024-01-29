@@ -188,6 +188,35 @@ public class HttpResponseDecoder extends HttpObjectDecoder {
         super(config);
     }
 
+    private HttpResponseStatus responseStatus;
+
+    @Override
+    protected HttpVersion setInitialLine(String[] initialLine) throws Exception {
+        responseStatus = HttpResponseStatus.valueOf(Integer.parseInt(initialLine[1]), initialLine[2]);
+        return HttpVersion.valueOf(initialLine[0]);
+    }
+
+    @Override
+    protected long getContentLength(HttpHeaders headers) {
+        long contentLength = super.getContentLength(headers);
+        if (contentLength == -1L && responseStatus.code() == 101 &&
+                headers.contains(HttpHeaderNames.SEC_WEBSOCKET_ORIGIN) &&
+                headers.contains(HttpHeaderNames.SEC_WEBSOCKET_LOCATION)) {
+            return 16L;
+        }
+        return contentLength;
+    }
+
+    @Override
+    protected boolean isContentAlwaysEmpty(HttpHeaders headers) {
+        return isContentAlwaysEmpty(headers, responseStatus);
+    }
+
+    @Override
+    protected HttpMessage createMessage(HttpVersion version, HttpHeaders headers) {
+        return new DefaultHttpResponse(version, responseStatus, headers);
+    }
+
     @Override
     protected HttpMessage createMessage(String[] initialLine) {
         return new DefaultHttpResponse(

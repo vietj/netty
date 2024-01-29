@@ -339,7 +339,7 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
         }
 
         @Override
-        protected boolean isContentAlwaysEmpty(HttpMessage msg) {
+        protected boolean isContentAlwaysEmpty(HttpHeaders headers, HttpResponseStatus status) {
             // Get the method of the HTTP request that corresponds to the
             // current response.
             //
@@ -347,13 +347,12 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
             // request / response pairs in sync.
             HttpMethod method = queue.poll();
 
-            final HttpResponseStatus status = ((HttpResponse) msg).status();
             final HttpStatusClass statusClass = status.codeClass();
             final int statusCode = status.code();
             if (statusClass == HttpStatusClass.INFORMATIONAL) {
                 // An informational response should be excluded from paired comparison.
                 // Just delegate to super method which has all the needed handling.
-                return super.isContentAlwaysEmpty(msg);
+                return super.isContentAlwaysEmpty(headers, status);
             }
 
             // If the remote peer did for example send multiple responses for one request (which is not allowed per
@@ -401,7 +400,12 @@ public final class HttpClientCodec extends CombinedChannelDuplexHandler<HttpResp
                         break;
                 }
             }
-            return super.isContentAlwaysEmpty(msg);
+            return super.isContentAlwaysEmpty(headers, status);
+        }
+
+        @Override
+        protected boolean isContentAlwaysEmpty(HttpMessage msg) {
+            return isContentAlwaysEmpty(msg.headers(), ((HttpResponse) msg).status());
         }
 
         @Override
