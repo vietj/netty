@@ -62,5 +62,39 @@
       <artifactId>gson</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.moditect</groupId>
+        <artifactId>moditect-maven-plugin</artifactId>
+        <version>1.2.2.Final</version>
+        <executions>
+          <execution>
+            <id>add-module-infos</id>
+            <phase>package</phase>
+            <goals>
+              <goal>add-module-info</goal>
+            </goals>
+            <configuration>
+              <jvmVersion>11</jvmVersion>
+              <failOnWarning>false</failOnWarning>
+              <outputTimestamp>1980-01-01T00:00:02Z</outputTimestamp>
+              <module>
+                <moduleInfo>
+                  <name>${javaModuleName}</name>
+                </moduleInfo>
+              </module>
+              <jdepsExtraArgs>
+                <jdepExtraArg>--multi-release</jdepExtraArg>
+                <jdepExtraArg>11</jdepExtraArg>
+              </jdepsExtraArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
 
