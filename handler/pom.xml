@@ -75,6 +75,25 @@
       <artifactId>${tcnative.artifactId}</artifactId>
       <classifier>${tcnative.classifier}</classifier>
       <optional>true</optional>
+      <exclusions>
+        <!--
+          Recursive self dependency causing the same artfifact to be added several times
+
+          [INFO] +- io.netty:netty-tcnative-boringssl-static:jar:2.0.65.Final:runtime
+          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:linux-x86_64:2.0.65.Final:runtime
+          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:linux-aarch_64:2.0.65.Final:runtime
+          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:osx-x86_64:2.0.65.Final:runtime
+          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:osx-aarch_64:2.0.65.Final:runtime
+          [INFO] |  \- io.netty:netty-tcnative-boringssl-static:jar:windows-x86_64:2.0.65.Final:runtime
+
+          https://github.com/netty/netty-tcnative/blob/main/boringssl-static/pom.xml#L1005
+
+        -->
+        <exclusion>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>${tcnative.artifactId}</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -117,5 +136,39 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.moditect</groupId>
+        <artifactId>moditect-maven-plugin</artifactId>
+        <version>1.2.2.Final</version>
+        <executions>
+          <execution>
+            <id>add-module-infos</id>
+            <phase>package</phase>
+            <goals>
+              <goal>add-module-info</goal>
+            </goals>
+            <configuration>
+              <jvmVersion>11</jvmVersion>
+              <failOnWarning>false</failOnWarning>
+              <outputTimestamp>1980-01-01T00:00:02Z</outputTimestamp>
+              <module>
+                <moduleInfo>
+                  <name>${javaModuleName}</name>
+                </moduleInfo>
+              </module>
+              <jdepsExtraArgs>
+                <jdepExtraArg>--multi-release</jdepExtraArg>
+                <jdepExtraArg>11</jdepExtraArg>
+              </jdepsExtraArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
 
