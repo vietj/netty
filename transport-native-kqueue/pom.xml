@@ -95,6 +95,25 @@
           </plugin>
 
           <plugin>
+            <groupId>io.github.dmlloyd.module-info</groupId>
+            <artifactId>module-info</artifactId>
+            <version>2.0</version>
+            <executions>
+              <execution>
+                <id>module-info</id>
+                <phase>process-classes</phase>
+                <configuration>
+                  <moduleName>${javaModuleName}</moduleName>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11/</outputDirectory>
+                </configuration>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <executions>
               <!-- Generate the JAR that contains the native library in it. -->
@@ -112,7 +131,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_kqueue_${os.detected.arch}.jnilib; osname=MacOSX; processor=${os.detected.arch}</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-kqueue</Fragment-Host>
-                      <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -663,34 +682,6 @@
               <excludes>
                 <exclude>META-INF/native/**</exclude>
               </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
-        <version>1.2.2.Final</version>
-        <executions>
-          <execution>
-            <id>add-module-infos</id>
-            <phase>package</phase>
-            <goals>
-              <goal>add-module-info</goal>
-            </goals>
-            <configuration>
-              <jvmVersion>11</jvmVersion>
-              <failOnWarning>false</failOnWarning>
-              <outputTimestamp>1980-01-01T00:00:02Z</outputTimestamp>
-              <module>
-                <moduleInfo>
-                  <name>${javaModuleName}</name>
-                </moduleInfo>
-              </module>
-              <jdepsExtraArgs>
-                <jdepExtraArg>--multi-release</jdepExtraArg>
-                <jdepExtraArg>11</jdepExtraArg>
-              </jdepsExtraArgs>
             </configuration>
           </execution>
         </executions>
