@@ -1,0 +1,38 @@
+requires:
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.resolver
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.transport.unix.common
+    static: true
+  - module: alpn.api
+    static: true
+  - module: io.netty.tcnative.classes.openssl
+    static: true
+  - module: npn.api
+    static: true
+  - module: org.bouncycastle.pkix
+    static: true
+  - module: org.bouncycastle.provider
+    static: true
+  - module: org.conscrypt
+    static: true
+exports:
+  - package: io.netty.handler.address
+  - package: io.netty.handler.flow
+  - package: io.netty.handler.flush
+  - package: io.netty.handler.ipfilter
+  - package: io.netty.handler.logging
+  - package: io.netty.handler.pcap
+  - package: io.netty.handler.ssl
+  - package: io.netty.handler.ssl.ocsp
+  - package: io.netty.handler.ssl.util
+  - package: io.netty.handler.stream
+  - package: io.netty.handler.timeout
+  - package: io.netty.handler.traffic
