@@ -1,0 +1,21 @@
+requires:
+  - module: jdk.unsupported
+    transitive: True
+  - module: java.logging
+  - module: commons.logging
+    static: True
+  - module: org.apache.log4j
+    static: True
+  - module: org.apache.logging.log4j
+    static: True
+  - module: org.jetbrains.annotations
+    static: True
+  - module: org.slf4j
+    static: True
+exports:
+  - package: io.netty.util
+  - package: io.netty.util.collection
+  - package: io.netty.util.concurrent
+  - package: io.netty.util.internal
+  - package: io.netty.util.internal.logging
+  - package: io.netty.util.internal.svm
