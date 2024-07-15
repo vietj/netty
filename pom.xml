@@ -661,6 +661,7 @@
     <skipNativeImageTestsuite>true</skipNativeImageTestsuite>
     <skipShadingTestsuite>false</skipShadingTestsuite>
     <skipDeploy>false</skipDeploy>
+    <multiReleaseJar>false</multiReleaseJar>
   </properties>
 
   <modules>
@@ -7614,6 +7615,9 @@
                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                   </manifest>
+                  <manifestEntries>
+                    <Multi-Release>${multiReleaseJar}</Multi-Release>
+                  </manifestEntries>
                   <index>true</index>
                   <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                 </archive>
