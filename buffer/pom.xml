@@ -29,6 +29,7 @@
   <name>Netty/Buffer</name>
 
   <properties>
+    <multiReleaseJar>true</multiReleaseJar>
     <javaModuleName>io.netty.buffer</javaModuleName>
   </properties>
 
@@ -47,30 +48,20 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
-        <version>1.2.2.Final</version>
+        <groupId>io.github.dmlloyd.module-info</groupId>
+        <artifactId>module-info</artifactId>
+        <version>2.0</version>
         <executions>
           <execution>
-            <id>add-module-infos</id>
-            <phase>package</phase>
-            <goals>
-              <goal>add-module-info</goal>
-            </goals>
+            <id>module-info</id>
+            <phase>process-classes</phase>
             <configuration>
-              <jvmVersion>11</jvmVersion>
-              <failOnWarning>false</failOnWarning>
-              <outputTimestamp>1980-01-01T00:00:02Z</outputTimestamp>
-              <module>
-                <moduleInfo>
-                  <name>${javaModuleName}</name>
-                </moduleInfo>
-              </module>
-              <jdepsExtraArgs>
-                <jdepExtraArg>--multi-release</jdepExtraArg>
-                <jdepExtraArg>11</jdepExtraArg>
-              </jdepsExtraArgs>
+              <moduleName>${javaModuleName}</moduleName>
+              <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11/</outputDirectory>
             </configuration>
+            <goals>
+              <goal>generate</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
