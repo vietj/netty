@@ -1,0 +1,14 @@
+requires:
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+exports:
+  - package: io.netty.handler.codec.socks
+  - package: io.netty.handler.codec.socksx
+  - package: io.netty.handler.codec.socksx.v4
+  - package: io.netty.handler.codec.socksx.v5
