@@ -1,0 +1,17 @@
+requires:
+  - module: io.netty.codec.http
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.handler
+    transitive: true
+  - module: com.aayushatharva.brotli4j
+    static: true
+exports:
+  - package: io.netty.handler.codec.http2
