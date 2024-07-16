@@ -1,0 +1,18 @@
+requires:
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.resolver
+    transitive: true
+  - module: io.netty.codec.dns
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.handler
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: java.naming
+exports:
+  - package: io.netty.resolver.dns
