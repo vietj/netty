@@ -1,0 +1,9 @@
+requires:
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+exports:
+  - package: io.netty.channel.unix
