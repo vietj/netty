@@ -93,7 +93,7 @@
                 netty-testsuite-native,netty-testsuite-native-image,netty-testsuite-native-image-client,
                 netty-testsuite-native-image-client-runtime-init,netty-testsuite-osgi,netty-testsuite-shading,
                 netty-transport-blockhound-tests,netty-transport-native-unix-common-tests,netty-microbench,
-                netty-dev-tools,netty-example
+                netty-dev-tools,netty-example,testsuite-jpms
               </skippedModules>
               <sourceFileExcludes>
                 <exclude>**/com/sun/**/*.java</exclude>
@@ -470,6 +470,16 @@
       <activation>
         <jdk>9</jdk>
       </activation>
+    </profile>
+
+    <profile>
+      <id>testsuite-jpms</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>testsuite-jpms</module>
+      </modules>
     </profile>
 
     <profile>
