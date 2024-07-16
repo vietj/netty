@@ -76,25 +76,6 @@
       <artifactId>${tcnative.artifactId}</artifactId>
       <classifier>${tcnative.classifier}</classifier>
       <optional>true</optional>
-      <exclusions>
-        <!--
-          Recursive self dependency causing the same artfifact to be added several times
-
-          [INFO] +- io.netty:netty-tcnative-boringssl-static:jar:2.0.65.Final:runtime
-          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:linux-x86_64:2.0.65.Final:runtime
-          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:linux-aarch_64:2.0.65.Final:runtime
-          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:osx-x86_64:2.0.65.Final:runtime
-          [INFO] |  +- io.netty:netty-tcnative-boringssl-static:jar:osx-aarch_64:2.0.65.Final:runtime
-          [INFO] |  \- io.netty:netty-tcnative-boringssl-static:jar:windows-x86_64:2.0.65.Final:runtime
-
-          https://github.com/netty/netty-tcnative/blob/main/boringssl-static/pom.xml#L1005
-
-        -->
-        <exclusion>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>${tcnative.artifactId}</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>

@@ -1,0 +1,25 @@
+requires:
+  - module: io.netty.handler
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+  - module: com.aayushatharva.brotli4j
+    static: true
+  - module: jzlib
+    static: true
+exports:
+  - package: io.netty.handler.codec.http
+  - package: io.netty.handler.codec.http.cookie
+  - package: io.netty.handler.codec.http.cors
+  - package: io.netty.handler.codec.http.multipart
+  - package: io.netty.handler.codec.http.websocketx
+  - package: io.netty.handler.codec.http.websocketx.extensions
+  - package: io.netty.handler.codec.http.websocketx.extensions.compression
+  - package: io.netty.handler.codec.rtsp
+  - package: io.netty.handler.codec.spdy

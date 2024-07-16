@@ -2,4 +2,4 @@ requires:
   - module: io.netty.common
     transitive: true
 exports:
-  - module: io.netty.resolver
+  - package: io.netty.resolver

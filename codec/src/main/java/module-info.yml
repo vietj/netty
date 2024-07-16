@@ -1,0 +1,36 @@
+requires:
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: protobuf.javanano
+    static: true
+  - module: jboss.marshalling
+    static: true
+  - module: com.github.luben.zstd_jni
+    static: true
+  - module: lzma.java
+    static: true
+  - module: com.google.protobuf
+    static: true
+  - module: jzlib
+    static: true
+  - module: lz4
+    static: true
+  - module: com.aayushatharva.brotli4j
+    static: true
+  - module: compress.lzf
+    static: true
+exports:
+  - package: io.netty.handler.codec
+  - package: io.netty.handler.codec.base64
+  - package: io.netty.handler.codec.bytes
+  - package: io.netty.handler.codec.compression
+  - package: io.netty.handler.codec.json
+  - package: io.netty.handler.codec.marshalling
+  - package: io.netty.handler.codec.protobuf
+  - package: io.netty.handler.codec.serialization
+  - package: io.netty.handler.codec.string
+  - package: io.netty.handler.codec.xml
