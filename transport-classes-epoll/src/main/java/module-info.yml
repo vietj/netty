@@ -1,0 +1,11 @@
+requires:
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.transport.unix.common
+    transitive: true
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+exports:
+  - package: io.netty.channel.epoll
