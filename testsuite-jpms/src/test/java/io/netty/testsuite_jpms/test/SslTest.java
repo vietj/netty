@@ -88,6 +88,20 @@ public class SslTest {
         rethrowIfNotNull(serverException);
     }
 
+    @Test
+    public void testOpenSslProvider() throws Exception {
+        mySetupClientHostnameValidation(serverCert,
+                serverKey,
+                clientTrust,
+                SslProvider.OPENSSL,
+                false);
+        assertTrue(clientLatch.await(10, TimeUnit.SECONDS));
+
+        rethrowIfNotNull(clientException);
+        assertTrue(serverLatch.await(5, TimeUnit.SECONDS));
+        rethrowIfNotNull(serverException);
+    }
+
     private Future<Void> mySetupClientHostnameValidation(File serverCrtFile,
                                                          File serverKeyFile,
                                                          File clientTrustCrtFile,
