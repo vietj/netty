@@ -10,7 +10,7 @@ requires:
   - module: io.netty.transport
     transitive: true
   - module: io.netty.transport.unix.common
-    static: true
+    transitive: true
   - module: alpn.api
     static: true
   - module: io.netty.tcnative.classes.openssl
