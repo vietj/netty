@@ -38,6 +38,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
+    <useTestModulePath>true</useTestModulePath>
   </properties>
 
   <dependencies>
@@ -52,16 +53,24 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+<!--
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netty-tcnative-classes</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>${tcnative.artifactId}</artifactId>
-      <classifier>${tcnative.classifier}</classifier>
+      <artifactId>netty-tcnative-openssl-static</artifactId>
+      <classifier>osx-aarch_64</classifier>
+      <version>2.0.65.Final</version>
       <optional>true</optional>
     </dependency>
+-->
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-codec</artifactId>
@@ -199,7 +208,7 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <useModulePath>true</useModulePath>
+            <useModulePath>${useTestModulePath}</useModulePath>
           </configuration>
         </plugin>
       </plugins>
@@ -210,7 +219,13 @@
         <version>3.2.0</version>
         <extensions>true</extensions>
         <configuration>
-          <launcher>http=io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpServer</launcher>
+          <addModules>
+            <addModule>jdk.jdwp.agent</addModule>
+            <!--
+            <addModule>io.netty.internal.tcnative.openssl.osx.aarch_64</addModule>
+            -->
+          </addModules>
+          <launcher>http=io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</launcher>
         </configuration>
       </plugin>
     </plugins>

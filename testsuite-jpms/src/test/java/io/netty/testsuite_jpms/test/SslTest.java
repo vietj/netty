@@ -39,6 +39,7 @@ import io.netty.util.concurrent.Promise;
 import io.netty.util.concurrent.PromiseNotifier;
 import io.netty.util.internal.ResourcesUtil;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
@@ -88,6 +89,7 @@ public class SslTest {
         rethrowIfNotNull(serverException);
     }
 
+    @Disabled("requires https://github.com/netty/netty-tcnative/pull/879")
     @Test
     public void testOpenSslProvider() throws Exception {
         mySetupClientHostnameValidation(serverCert,
@@ -182,10 +184,6 @@ public class SslTest {
                 SslHandler sslHandler = clientSslCtx.newHandler(ch.alloc(), expectedHost, 0);
 
                 SSLParameters parameters = sslHandler.engine().getSSLParameters();
-//                if (SslUtils.isValidHostNameForSNI(expectedHost)) {
-//                    assertEquals(1, parameters.getServerNames().size());
-//                    assertEquals(new SNIHostName(expectedHost), parameters.getServerNames().get(0));
-//                }
                 parameters.setEndpointIdentificationAlgorithm("HTTPS");
                 sslHandler.engine().setSSLParameters(parameters);
                 p.addLast(sslHandler);
