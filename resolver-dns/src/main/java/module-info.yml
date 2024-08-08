@@ -14,5 +14,3 @@ requires:
   - module: io.netty.transport
     transitive: true
   - module: java.naming
-exports:
-  - package: io.netty.resolver.dns

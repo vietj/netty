@@ -23,16 +23,3 @@ requires:
     static: true
   - module: org.conscrypt
     static: true
-exports:
-  - package: io.netty.handler.address
-  - package: io.netty.handler.flow
-  - package: io.netty.handler.flush
-  - package: io.netty.handler.ipfilter
-  - package: io.netty.handler.logging
-  - package: io.netty.handler.pcap
-  - package: io.netty.handler.ssl
-  - package: io.netty.handler.ssl.ocsp
-  - package: io.netty.handler.ssl.util
-  - package: io.netty.handler.stream
-  - package: io.netty.handler.timeout
-  - package: io.netty.handler.traffic

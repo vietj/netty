@@ -1,5 +1,3 @@
 requires:
   - module: io.netty.common
     transitive: true
-exports:
-  - package: io.netty.resolver

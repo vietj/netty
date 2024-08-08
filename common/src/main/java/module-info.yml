@@ -13,9 +13,7 @@ requires:
   - module: org.slf4j
     static: True
 exports:
-  - package: io.netty.util
-  - package: io.netty.util.collection
-  - package: io.netty.util.concurrent
+  # module-info plugin skips any package containing "internal" therefore we explicitly need to add them
   - package: io.netty.util.internal
   - package: io.netty.util.internal.logging
   - package: io.netty.util.internal.svm

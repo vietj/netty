@@ -13,5 +13,3 @@ requires:
     transitive: true
   - module: com.aayushatharva.brotli4j
     static: true
-exports:
-  - package: io.netty.handler.codec.http2

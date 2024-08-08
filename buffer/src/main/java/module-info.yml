@@ -1,6 +1,3 @@
 requires:
   - module: io.netty.common
     transitive: True
-exports:
-  - package: io.netty.buffer
-  - package: io.netty.buffer.search

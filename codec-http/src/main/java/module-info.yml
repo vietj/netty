@@ -13,13 +13,3 @@ requires:
     static: true
   - module: jzlib
     static: true
-exports:
-  - package: io.netty.handler.codec.http
-  - package: io.netty.handler.codec.http.cookie
-  - package: io.netty.handler.codec.http.cors
-  - package: io.netty.handler.codec.http.multipart
-  - package: io.netty.handler.codec.http.websocketx
-  - package: io.netty.handler.codec.http.websocketx.extensions
-  - package: io.netty.handler.codec.http.websocketx.extensions.compression
-  - package: io.netty.handler.codec.rtsp
-  - package: io.netty.handler.codec.spdy
