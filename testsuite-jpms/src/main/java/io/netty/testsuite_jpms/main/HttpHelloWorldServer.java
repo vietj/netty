@@ -16,11 +16,15 @@
 package io.netty.testsuite_jpms.main;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.Channel;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.kqueue.KQueueIoHandler;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -61,8 +65,14 @@ public final class HttpHelloWorldServer {
     // ./target/maven-jlink/default/bin/java
     // --add-modules io.netty.tcnative.classes.openssl,io.netty.internal.tcnative.openssl.osx.aarch_64
     // -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer --ssl
+
+    // Running with KQueue
+    // ./target/maven-jlink/default/bin/java --add-modules io.netty.transport.kqueue.osx.aarch_64
+    // -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer
+    // --transport kqueue
     public static void main(String[] args) throws Exception {
 
+        String transport = "nio";
         boolean ssl = false;
         Integer port = null;
         for (int i = 0; i < args.length; i++) {
@@ -72,12 +82,37 @@ public final class HttpHelloWorldServer {
             if (args[i].equals("--port")) {
                 if (i < args.length - 1) {
                     port = Integer.parseInt(args[i + 1]);
+                } else {
+                    System.exit(1);
+                }
+            }
+            if (args[i].equals("--transport")) {
+                if (i < args.length - 1) {
+                    transport = args[i + 1];
+                } else {
+                    System.exit(1);
                 }
             }
         }
 
         if (port == null) {
             port = ssl ? 8443 : 8080;
+        }
+
+        IoHandlerFactory ioHandlerFactory;
+        Class<? extends ServerSocketChannel> serverSocketChannelFactory;
+        switch (transport) {
+            case "nio":
+                ioHandlerFactory = NioIoHandler.newFactory();
+                serverSocketChannelFactory = NioServerSocketChannel.class;
+                break;
+            case "kqueue":
+                ioHandlerFactory = KQueueIoHandler.newFactory();
+                serverSocketChannelFactory = KQueueServerSocketChannel.class;
+                break;
+            default:
+                System.exit(1);
+                return;
         }
 
         SslContext sslContext;
@@ -97,13 +132,13 @@ public final class HttpHelloWorldServer {
         }
 
         // Configure the server.
-        EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
-        EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        EventLoopGroup bossGroup = new MultiThreadIoEventLoopGroup(1, ioHandlerFactory);
+        EventLoopGroup workerGroup = new MultiThreadIoEventLoopGroup(ioHandlerFactory);
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
             b.group(bossGroup, workerGroup)
-             .channel(NioServerSocketChannel.class)
+             .channel(serverSocketChannelFactory)
              .handler(new LoggingHandler(LogLevel.INFO))
              .childHandler(new HttpHelloWorldServerInitializer(sslContext));
 

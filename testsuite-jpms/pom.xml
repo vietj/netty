@@ -115,19 +115,21 @@
           <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
+-->
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>netty-transport-native-kqueue</artifactId>
           <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
+        <!--
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>netty-resolver-dns-native-macos</artifactId>
           <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
--->
+        -->
       </dependencies>
     </profile>
 
@@ -161,7 +163,7 @@
         </dependency>
       </dependencies>
     </profile>
-
+-->
     <profile>
       <id>mac</id>
       <activation>
@@ -177,6 +179,7 @@
           <classifier>${jni.classifier}</classifier>
           <scope>compile</scope>
         </dependency>
+        <!--
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>netty-resolver-dns-native-macos</artifactId>
@@ -190,9 +193,9 @@
           <version>${project.version}</version>
           <scope>compile</scope>
         </dependency>
+-->
       </dependencies>
     </profile>
--->
   </profiles>
 
   <build>
