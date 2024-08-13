@@ -1,0 +1,3 @@
+requires:
+  - module: io.netty.resolver.dns
+    transitive: true

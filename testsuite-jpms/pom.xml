@@ -57,6 +57,12 @@
       <artifactId>netty-codec-http</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-resolver-dns-classes-macos</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
 <!--
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -179,7 +185,7 @@
           <classifier>${jni.classifier}</classifier>
           <scope>compile</scope>
         </dependency>
-        <!--
+        <!-- note : this is not yet tested with jlink -->
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>netty-resolver-dns-native-macos</artifactId>
@@ -187,6 +193,7 @@
           <classifier>${jni.classifier}</classifier>
           <scope>compile</scope>
         </dependency>
+        <!--
         <dependency>
           <groupId>${project.groupId}</groupId>
           <artifactId>netty-transport-native-epoll</artifactId>
