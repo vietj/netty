@@ -82,6 +82,7 @@
       <artifactId>netty-codec</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- not tested with jlink yet -->
     <dependency>
       <groupId>com.aayushatharva.brotli4j</groupId>
       <artifactId>brotli4j</artifactId>
