@@ -33,6 +33,8 @@ import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NativeTransportTest {
 
+    @EnabledOnOs(OS.MAC)
     @Test
     public void testKQueue() throws Exception {
         mySetupClientHostnameValidation(

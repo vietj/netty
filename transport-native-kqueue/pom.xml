@@ -218,7 +218,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_kqueue_aarch_64.jnilib; osname=MacOSX; processor=aarch64</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-kqueue</Fragment-Host>
-                      <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -314,7 +314,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_kqueue_x86_64.jnilib; osname=MacOSX; processor=x86_64</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-kqueue</Fragment-Host>
-                      <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -420,6 +420,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_kqueue_${os.detected.arch}.jnilib; osname=OpenBSD; processor=${os.detected.arch}</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-kqueue</Fragment-Host>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -525,6 +526,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_kqueue_${os.detected.arch}.jnilib; osname=FreeBSD; processor=${os.detected.arch}</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-kqueue</Fragment-Host>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -575,6 +577,7 @@
   </profiles>
 
   <properties>
+    <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
     <javaModuleName>io.netty.transport.kqueue.${javaModuleNameClassifier}</javaModuleName>
     <!-- Needed as we use SelfSignedCertificate in our tests -->

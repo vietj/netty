@@ -172,7 +172,7 @@
     </profile>
 -->
     <profile>
-      <id>mac</id>
+      <id>osx</id>
       <activation>
         <os>
           <family>mac</family>
@@ -210,6 +210,17 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>maven-jlink-plugin</artifactId>
+          <version>3.2.0</version>
+          <extensions>true</extensions>
+          <configuration>
+            <addModules>
+              <addModule>jdk.jdwp.agent</addModule>
+            </addModules>
+            <launcher>http=io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</launcher>
+          </configuration>
+        </plugin>
+        <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <skipMain>${skipJpmsTestsuite}</skipMain>
@@ -227,17 +238,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-jlink-plugin</artifactId>
-        <version>3.2.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <addModules>
-            <addModule>jdk.jdwp.agent</addModule>
-            <!--
-            <addModule>io.netty.internal.tcnative.openssl.osx.aarch_64</addModule>
-            -->
-          </addModules>
-          <launcher>http=io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</launcher>
-        </configuration>
       </plugin>
     </plugins>
   </build>
