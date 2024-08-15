@@ -58,6 +58,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netty-resolver-dns-classes-macos</artifactId>
       <version>${project.version}</version>
