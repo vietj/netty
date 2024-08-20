@@ -19,6 +19,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
  *
  * <pre><code>
  * {@link ChannelPipeline} pipeline = ...;
- * pipeline.addLast("udpDecoder", new {@link DatagramPacketDecoder}(new {@code ProtobufDecoder}(...));
+ * pipeline.addLast("udpDecoder", new {@link DatagramPacketDecoder}(new {@link ProtobufDecoder}(...));
  * </code></pre>
  */
 public class DatagramPacketDecoder extends MessageToMessageDecoder<DatagramPacket> {
