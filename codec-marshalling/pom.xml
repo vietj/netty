@@ -23,13 +23,13 @@
     <version>4.2.0.Alpha3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>netty-codec</artifactId>
+  <artifactId>netty-codec-marshalling</artifactId>
   <packaging>jar</packaging>
 
-  <name>Netty/Codec</name>
+  <name>Netty/Codec/Marshalling</name>
 
   <properties>
-    <javaModuleName>io.netty.codec</javaModuleName>
+    <javaModuleName>io.netty.codec.marshalling</javaModuleName>
   </properties>
 
   <dependencies>
@@ -48,16 +48,26 @@
       <artifactId>netty-transport</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-codec</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling</artifactId>
+      <optional>true</optional>
     </dependency>
 
-    <!-- Test dependency for Bzip2 compression codec -->
+    <!-- Test dependencies for jboss marshalling encoder/decoder -->
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling-serial</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling-river</artifactId>
       <scope>test</scope>
     </dependency>
 

@@ -23,13 +23,13 @@
     <version>4.2.0.Alpha3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>netty-codec</artifactId>
+  <artifactId>netty-codec-protobuf</artifactId>
   <packaging>jar</packaging>
 
-  <name>Netty/Codec</name>
+  <name>Netty/Codec/Protobuf</name>
 
   <properties>
-    <javaModuleName>io.netty.codec</javaModuleName>
+    <javaModuleName>io.netty.codec.protobuf</javaModuleName>
   </properties>
 
   <dependencies>
@@ -48,17 +48,20 @@
       <artifactId>netty-transport</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-codec</artifactId>
+      <version>${project.version}</version>
     </dependency>
-
-    <!-- Test dependency for Bzip2 compression codec -->
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-      <scope>test</scope>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf.nano</groupId>
+      <artifactId>protobuf-javanano</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <!-- Automatic native-image reflection metadata generation for handlers dependencies -->
