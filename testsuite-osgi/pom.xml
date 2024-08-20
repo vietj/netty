@@ -258,6 +258,7 @@
             <configuration>
               <name>%bundle.symbolicName%.link</name>
               <value>%url%</value>
+              <separator>${line.separator}</separator>
               <dependencySet>
                 <scope>test</scope>
               </dependencySet>

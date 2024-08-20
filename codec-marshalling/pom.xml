@@ -56,7 +56,6 @@
     <dependency>
       <groupId>org.jboss.marshalling</groupId>
       <artifactId>jboss-marshalling</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <!-- Test dependencies for jboss marshalling encoder/decoder -->
