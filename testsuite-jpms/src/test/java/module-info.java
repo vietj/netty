@@ -12,6 +12,7 @@ open module io.netty.testsuite_jpms.test {
     requires io.netty.codec.haproxy;
     requires io.netty.codec.redis;
     requires io.netty.codec.stomp;
+    requires io.netty.codec.socks;
     requires io.netty.handler;
     requires io.netty.transport.classes.kqueue;
     requires io.netty.resolver.dns.classes.macos;
