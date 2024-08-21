@@ -17,23 +17,26 @@ package io.netty.testsuite_jpms.test;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.handler.codec.smtp.SmtpRequestEncoder;
-import io.netty.handler.codec.smtp.SmtpRequests;
-import io.netty.util.CharsetUtil;
+import io.netty.handler.codec.memcache.binary.BinaryMemcacheRequest;
+import io.netty.handler.codec.memcache.binary.BinaryMemcacheRequestEncoder;
+import io.netty.handler.codec.memcache.binary.DefaultBinaryMemcacheRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CodecSmtpTest {
+public class CodecMemcacheTest {
 
     @Test
     public void testEncoder() {
-        EmbeddedChannel channel = new EmbeddedChannel(new SmtpRequestEncoder());
-        assertTrue(channel.writeOutbound(SmtpRequests.ehlo("localhost")));
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryMemcacheRequestEncoder());
+        BinaryMemcacheRequest request = new DefaultBinaryMemcacheRequest();
+        assertTrue(channel.writeOutbound(request));
         assertTrue(channel.finish());
-        ByteBuf buffer = channel.readOutbound();
-        assertEquals("EHLO localhost\r\n", buffer.toString(CharsetUtil.US_ASCII));
-        buffer.release();
-        assertNull(channel.readOutbound());
+        ByteBuf written = channel.readOutbound();
+        assertEquals(24, written.readableBytes());
+        assertEquals(24, written.readableBytes());
+        assertEquals((byte) 0x80, written.readByte());
+        assertEquals((byte) 0x00, written.readByte());
+        written.release();
     }
 }
