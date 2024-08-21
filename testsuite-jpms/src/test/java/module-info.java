@@ -1,4 +1,7 @@
 open module io.netty.testsuite_jpms.test {
+    requires org.slf4j;
+    requires ch.qos.logback.core;
+    requires ch.qos.logback.classic;
     requires org.junit.jupiter.api;
     requires io.netty.buffer;
     requires io.netty.codec;
