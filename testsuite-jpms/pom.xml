@@ -48,18 +48,23 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.netty</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>netty-handler</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.netty</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>netty-codec-http</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.netty</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>netty-codec-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-codec-smtp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
