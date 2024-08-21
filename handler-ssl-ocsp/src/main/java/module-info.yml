@@ -1,0 +1,7 @@
+requires:
+  - module: io.netty.handler
+    transitive: true
+  - module: io.netty.codec.http
+  - module: io.netty.resolver.dns
+  - module: org.bouncycastle.pkix
+  - module: org.bouncycastle.provider

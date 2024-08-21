@@ -16,9 +16,12 @@ open module io.netty.testsuite_jpms.test {
     requires io.netty.codec.protobuf;
     requires io.netty.codec.marshalling;
     requires io.netty.handler;
+    requires io.netty.handler.ssl.ocsp;
     requires io.netty.transport.classes.kqueue;
     requires io.netty.resolver.dns.classes.macos;
     requires io.netty.resolver.dns;
+    requires io.netty.codec.http;
     requires io.netty.codec.http2;
     requires jboss.marshalling;
+    requires org.bouncycastle.pkix;
 }
