@@ -55,7 +55,7 @@ import static io.netty.handler.ssl.SslContextBuilder.forServer;
 import static io.netty.handler.ssl.SslContextBuilder.forClient;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SslTest {
+public class HandlerSslTest {
 
     private static File serverCert;
     private static File serverKey;
@@ -70,9 +70,9 @@ public class SslTest {
 
     @BeforeAll
     public static void setup() {
-        serverCert = ResourcesUtil.getFile(SslTest.class, "localhost_server.pem");
-        serverKey = ResourcesUtil.getFile(SslTest.class, "localhost_server.key");
-        clientTrust = ResourcesUtil.getFile(SslTest.class, "mutual_auth_ca.pem");
+        serverCert = ResourcesUtil.getFile(HandlerSslTest.class, "localhost_server.pem");
+        serverKey = ResourcesUtil.getFile(HandlerSslTest.class, "localhost_server.key");
+        clientTrust = ResourcesUtil.getFile(HandlerSslTest.class, "mutual_auth_ca.pem");
     }
 
     @Test

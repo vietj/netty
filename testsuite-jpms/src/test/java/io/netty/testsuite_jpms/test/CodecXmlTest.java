@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class XmlTest {
+public class CodecXmlTest {
 
     private static final String XML1 = "<?xml version=\"1.0\"?>" +
             "<!DOCTYPE employee SYSTEM \"employee.dtd\">" +

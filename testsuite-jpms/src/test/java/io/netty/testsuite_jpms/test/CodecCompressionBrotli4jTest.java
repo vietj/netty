@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class Brotli4jTest {
+public class CodecCompressionBrotli4jTest {
 
     @Test
     public void testSimple() {
