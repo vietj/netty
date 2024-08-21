@@ -1,0 +1,4 @@
+requires:
+  - module: io.netty.handler
+    transitive: true
+  - module: org.bouncycastle.pkix
