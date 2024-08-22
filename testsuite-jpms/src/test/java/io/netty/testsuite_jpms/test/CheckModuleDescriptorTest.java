@@ -17,9 +17,15 @@ package io.netty.testsuite_jpms.test;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CheckModuleDescriptorTest {
+
+    private static final Set<String> AUTOMATIC_MODULES_ALLOWED = Set.of(
+            "com.google.protobuf", "protobuf.javanano", "jboss.marshalling", "jboss.marshalling.serial");
 
     /**
      * Ensure that classpath is empty and all module are named and not automatic.
@@ -31,7 +37,11 @@ public class CheckModuleDescriptorTest {
         ModuleLayer layer = ModuleLayer.boot();
         layer.modules().forEach(module -> {
             assertTrue(module.isNamed(), "Module " + module.getName() + " is not named");
-            assertFalse(module.getDescriptor().isAutomatic(), "Module " + module.getName() + " is automatic");
+            boolean automatic = AUTOMATIC_MODULES_ALLOWED.contains(module.getName());
+            if (!automatic) {
+                assertFalse(module.getDescriptor().isAutomatic(), "Unexpected automatic module "
+                        + module.getName());
+            }
         });
     }
 }

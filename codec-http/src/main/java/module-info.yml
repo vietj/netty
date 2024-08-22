@@ -5,6 +5,8 @@ requires:
     transitive: true
   - module: io.netty.codec
     transitive: true
+  - module: io.netty.codec.compression
+    transitive: true
   - module: io.netty.transport
     transitive: true
   - module: io.netty.buffer

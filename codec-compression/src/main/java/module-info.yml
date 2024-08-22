@@ -1,0 +1,21 @@
+requires:
+  - module: io.netty.transport
+    transitive: true
+  - module: io.netty.buffer
+    transitive: true
+  - module: io.netty.common
+    transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: com.github.luben.zstd_jni
+    static: true
+  - module: lzma.java
+    static: true
+  - module: jzlib
+    static: true
+  - module: lz4
+    static: true
+  - module: com.aayushatharva.brotli4j
+    static: true
+  - module: compress.lzf
+    static: true

@@ -5,3 +5,7 @@ requires:
     transitive: true
   - module: io.netty.common
     transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: jboss.marshalling
+    static: true

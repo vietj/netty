@@ -5,3 +5,9 @@ requires:
     transitive: true
   - module: io.netty.common
     transitive: true
+  - module: io.netty.codec
+    transitive: true
+  - module: protobuf.javanano
+    static: true
+  - module: com.google.protobuf
+    static: true
