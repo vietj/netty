@@ -162,7 +162,7 @@
       <artifactId>bcprov-jdk18on</artifactId>
       <scope>test</scope>
     </dependency>
-<!--
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netty-tcnative-classes</artifactId>
@@ -170,12 +170,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netty-tcnative-openssl-static</artifactId>
-      <classifier>osx-aarch_64</classifier>
-      <version>2.0.65.Final</version>
-      <optional>true</optional>
+      <artifactId>netty-tcnative-boringssl-static</artifactId>
+      <classifier>${tcnative.classifier}</classifier>
+      <version>${tcnative.version}</version>
     </dependency>
--->
+
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-codec</artifactId>
@@ -315,6 +314,7 @@
           <configuration>
             <addModules>
               <addModule>jdk.jdwp.agent</addModule>
+              <addModule>io.netty.internal.tcnative.openssl.${os.detected.name}.${os.detected.arch}</addModule>
             </addModules>
             <launcher>http=io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</launcher>
           </configuration>

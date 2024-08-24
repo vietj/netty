@@ -89,7 +89,6 @@ public class HandlerSslTest {
         rethrowIfNotNull(serverException);
     }
 
-    @Disabled("requires https://github.com/netty/netty-tcnative/pull/879")
     @Test
     public void testOpenSslProvider() throws Exception {
         mySetupClientHostnameValidation(serverCert,

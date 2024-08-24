@@ -42,8 +42,24 @@ import java.nio.file.Path;
 import static io.netty.handler.ssl.SslContextBuilder.forServer;
 
 /**
- * An HTTP server that sends back the content of the received HTTP request
- * in a pretty plaintext form.
+ * <p>An HTTP server that sends back the content of the received HTTP request
+ * in a pretty plaintext form.</p>
+ *
+ * <p>Running the server:
+ * <ul>
+ *     <li>./target/maven-jlink/default/bin/java -m
+ *     io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</li>
+ *     <li>./target/maven-jlink/default/bin/http (shortcut)</li>
+ * </ul>
+ *
+ * <p>Running with OpenSSL requires to add the
+ * io.netty.internal.tcnative.openssl.${os.detected.name}.${os.detected.arch} module, e.g.
+ * ./target/maven-jlink/default/bin/java --add-modules io.netty.internal.tcnative.openssl.osx.aarch_64
+ * -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer --ssl
+ *
+ * <p>Running with native requires to add io.netty.transport.kqueue.${os.detected.name}.${os.detected.arch}, e.g.
+ * ./target/maven-jlink/default/bin/java --add-modules io.netty.transport.kqueue.osx.aarch_64
+ * -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer --transport kqueue
  */
 public final class HttpHelloWorldServer {
 
@@ -61,34 +77,34 @@ public final class HttpHelloWorldServer {
         return file;
     }
 
-    // Running SSL with openssl static
-    // ./target/maven-jlink/default/bin/java
-    // --add-modules io.netty.tcnative.classes.openssl,io.netty.internal.tcnative.openssl.osx.aarch_64
-    // -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer --ssl
-
-    // Running with KQueue
-    // ./target/maven-jlink/default/bin/java --add-modules io.netty.transport.kqueue.osx.aarch_64
-    // -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer
-    // --transport kqueue
     public static void main(String[] args) throws Exception {
 
         String transport = "nio";
         boolean ssl = false;
+        SslProvider sslProvider = SslProvider.JDK;
+
         Integer port = null;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--ssl")) {
                 ssl = true;
             }
+            if (args[i].equals("--ssl-provider")) {
+                if (i < args.length - 1) {
+                    sslProvider = SslProvider.valueOf(args[++i]);
+                } else {
+                    System.exit(1);
+                }
+            }
             if (args[i].equals("--port")) {
                 if (i < args.length - 1) {
-                    port = Integer.parseInt(args[i + 1]);
+                    port = Integer.parseInt(args[++i]);
                 } else {
                     System.exit(1);
                 }
             }
             if (args[i].equals("--transport")) {
                 if (i < args.length - 1) {
-                    transport = args[i + 1];
+                    transport = args[++i];
                 } else {
                     System.exit(1);
                 }
@@ -120,7 +136,7 @@ public final class HttpHelloWorldServer {
             File serverCert = unpackFile("localhost_server.pem");
             File serverKey = unpackFile("localhost_server.key");
             sslContext = forServer(serverCert, serverKey, null)
-                    .sslProvider(SslProvider.JDK)
+                    .sslProvider(sslProvider)
                     .protocols("TLSv1.2")
                     .trustManager(InsecureTrustManagerFactory.INSTANCE)
                     .ciphers(null, IdentityCipherSuiteFilter.INSTANCE)
