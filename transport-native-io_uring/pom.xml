@@ -27,8 +27,9 @@
   <packaging>jar</packaging>
 
   <properties>
+    <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
-    <javaModuleName>io.netty.transport.io_uring</javaModuleName>
+    <javaModuleName>io.netty.transport.io_uring.${javaModuleNameClassifier}</javaModuleName>
     <unix.common.lib.name>netty-unix-common</unix.common.lib.name>
     <unix.common.lib.dir>${project.build.directory}/unix-common-lib</unix.common.lib.dir>
     <unix.common.lib.unpacked.dir>${unix.common.lib.dir}/META-INF/native/lib</unix.common.lib.unpacked.dir>
@@ -135,6 +136,15 @@
             </executions>
           </plugin>
           <plugin>
+            <groupId>io.github.dmlloyd.module-info</groupId>
+            <artifactId>module-info</artifactId>
+            <executions>
+              <execution>
+                <id>module-info</id>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <executions>
               <!-- Generate the JAR that contains the native library in it. -->
@@ -152,7 +162,7 @@
                     <manifestEntries>
                       <Bundle-NativeCode>META-INF/native/libnetty_transport_native_io_uring_${os.detected.arch}.so; osname=Linux; processor=${os.detected.arch},*</Bundle-NativeCode>
                       <Fragment-Host>io.netty.transport-classes-io_uring</Fragment-Host>
-                      <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                      <Multi-Release>true</Multi-Release>
                     </manifestEntries>
                     <index>true</index>
                     <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -367,6 +377,15 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>io.github.dmlloyd.module-info</groupId>
+        <artifactId>module-info</artifactId>
+        <executions>
+          <execution>
+            <id>module-info</id>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <!-- Generate the fallback JAR that does not contain the native library. -->
@@ -382,7 +401,7 @@
                   <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                  <Multi-Release>true</Multi-Release>
                 </manifestEntries>
                 <index>true</index>
                 <manifestFile>${project.build.directory}/manifests/MANIFEST.MF</manifestFile>

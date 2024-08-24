@@ -28,6 +28,8 @@ import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.uring.IoUringIoHandler;
+import io.netty.channel.uring.IoUringServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.IdentityCipherSuiteFilter;
@@ -131,6 +133,10 @@ public final class HttpHelloWorldServer {
             case "epoll":
                 ioHandlerFactory = EpollIoHandler.newFactory();
                 serverSocketChannelFactory = EpollServerSocketChannel.class;
+                break;
+            case "io_uring":
+                ioHandlerFactory = IoUringIoHandler.newFactory();
+                serverSocketChannelFactory = IoUringServerSocketChannel.class;
                 break;
             default:
                 System.exit(1);

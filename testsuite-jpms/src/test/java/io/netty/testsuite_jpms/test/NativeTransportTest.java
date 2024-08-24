@@ -35,6 +35,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.IoHandlerFactory;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.uring.IoUringIoHandler;
+import io.netty.channel.uring.IoUringServerSocketChannel;
+import io.netty.channel.uring.IoUringSocketChannel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -66,6 +69,15 @@ public class NativeTransportTest {
                 EpollIoHandler.newFactory(),
                 EpollServerSocketChannel.class,
                 EpollSocketChannel.class);
+    }
+
+    @EnabledOnOs(OS.LINUX)
+    @Test
+    public void testIoUring() throws Exception {
+        mySetupClientHostnameValidation(
+                IoUringIoHandler.newFactory(),
+                IoUringServerSocketChannel.class,
+                IoUringSocketChannel.class);
     }
 
     private void mySetupClientHostnameValidation(IoHandlerFactory ioHandlerFactory,

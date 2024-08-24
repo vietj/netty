@@ -19,6 +19,7 @@ open module io.netty.testsuite_jpms.test {
     requires io.netty.handler.ssl.ocsp;
     requires io.netty.transport.classes.kqueue;
     requires io.netty.transport.classes.epoll;
+    requires io.netty.transport.classes.io_uring;
     requires io.netty.resolver.dns.classes.macos;
     requires io.netty.resolver.dns;
     requires io.netty.codec.http;
