@@ -176,6 +176,17 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-transport-classes-kqueue</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netty-transport-classes-epoll</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-codec</artifactId>
       <version>${project.version}</version>
@@ -221,12 +232,6 @@
           <scope>compile</scope>
         </dependency>
 -->
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <version>${project.version}</version>
-          <scope>compile</scope>
-        </dependency>
         <!--
         <dependency>
           <groupId>${project.groupId}</groupId>
@@ -238,7 +243,6 @@
       </dependencies>
     </profile>
 
-<!--
     <profile>
       <id>linux</id>
       <activation>
@@ -254,21 +258,9 @@
           <classifier>${jni.classifier}</classifier>
           <scope>compile</scope>
         </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <version>${project.version}</version>
-          <scope>compile</scope>
-        </dependency>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>netty-resolver-dns-native-macos</artifactId>
-          <version>${project.version}</version>
-          <scope>compile</scope>
-        </dependency>
       </dependencies>
     </profile>
--->
+
     <profile>
       <id>osx</id>
       <activation>
@@ -302,6 +294,7 @@
 -->
       </dependencies>
     </profile>
+
   </profiles>
 
   <build>

@@ -21,6 +21,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.Channel;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.epoll.EpollIoHandler;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.kqueue.KQueueIoHandler;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.nio.NioIoHandler;
@@ -125,6 +127,10 @@ public final class HttpHelloWorldServer {
             case "kqueue":
                 ioHandlerFactory = KQueueIoHandler.newFactory();
                 serverSocketChannelFactory = KQueueServerSocketChannel.class;
+                break;
+            case "epoll":
+                ioHandlerFactory = EpollIoHandler.newFactory();
+                serverSocketChannelFactory = EpollServerSocketChannel.class;
                 break;
             default:
                 System.exit(1);

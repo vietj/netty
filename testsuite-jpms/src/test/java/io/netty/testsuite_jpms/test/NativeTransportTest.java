@@ -23,6 +23,9 @@ import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.epoll.EpollIoHandler;
+import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.kqueue.KQueueIoHandler;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.kqueue.KQueueSocketChannel;
@@ -54,6 +57,15 @@ public class NativeTransportTest {
                 KQueueIoHandler.newFactory(),
                 KQueueServerSocketChannel.class,
                 KQueueSocketChannel.class);
+    }
+
+    @EnabledOnOs(OS.LINUX)
+    @Test
+    public void testEpoll() throws Exception {
+        mySetupClientHostnameValidation(
+                EpollIoHandler.newFactory(),
+                EpollServerSocketChannel.class,
+                EpollSocketChannel.class);
     }
 
     private void mySetupClientHostnameValidation(IoHandlerFactory ioHandlerFactory,
