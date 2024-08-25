@@ -71,7 +71,7 @@
                 <configuration>
                   <name>netty_transport_native_kqueue_${os.detected.arch}</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -104,6 +104,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -169,7 +170,7 @@
                 <configuration>
                   <name>netty_transport_native_kqueue_aarch_64</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -200,6 +201,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -265,7 +267,7 @@
                 <configuration>
                   <name>netty_transport_native_kqueue_x86_64</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -296,6 +298,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -372,7 +375,7 @@
                 <configuration>
                   <name>netty_transport_native_kqueue_${os.detected.arch}</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -402,6 +405,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -478,7 +482,7 @@
                 <configuration>
                   <name>netty_transport_native_kqueue_${os.detected.arch}</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -508,6 +512,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -569,7 +574,8 @@
   <properties>
     <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
-    <javaModuleName>io.netty.transport.kqueue.${javaModuleNameClassifier}</javaModuleName>
+    <javaModuleName>io.netty.transport.kqueue</javaModuleName>
+    <nativeJavaModuleName>${javaModuleName}.${javaModuleNameClassifier}</nativeJavaModuleName>
     <!-- Needed as we use SelfSignedCertificate in our tests -->
     <argLine.java9.extras>--add-exports java.base/sun.security.x509=ALL-UNNAMED</argLine.java9.extras>
     <!-- Always check JNI during test run so we catch bugs that could cause crashes -->
@@ -581,6 +587,7 @@
     <jni.compiler.args.cflags>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -Wunused-variable -fvisibility=hidden -I${unix.common.include.unpacked.dir}</jni.compiler.args.cflags>
     <jni.compiler.args.ldflags>LDFLAGS=-z now -L${unix.common.lib.unpacked.dir} -Wl,--whole-archive -l${unix.common.lib.name} -Wl,--no-whole-archive</jni.compiler.args.ldflags>
     <nativeSourceDirectory>${project.basedir}/src/main/c</nativeSourceDirectory>
+    <nativeOutputDirectory>${project.build.directory}/native-classes</nativeOutputDirectory>
   </properties>
 
   <dependencies>
@@ -657,11 +664,42 @@
         </executions>
       </plugin>
       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resource-one</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${nativeOutputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.outputDirectory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>io.github.dmlloyd.module-info</groupId>
         <artifactId>module-info</artifactId>
         <executions>
           <execution>
             <id>module-info</id>
+          </execution>
+          <execution>
+            <id>native-module-info</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <moduleName>${nativeJavaModuleName}</moduleName>
+              <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>generate</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

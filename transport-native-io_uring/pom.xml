@@ -29,7 +29,8 @@
   <properties>
     <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
-    <javaModuleName>io.netty.transport.io_uring.${javaModuleNameClassifier}</javaModuleName>
+    <javaModuleName>io.netty.transport.io_uring</javaModuleName>
+    <nativeJavaModuleName>${javaModuleName}.${javaModuleNameClassifier}</nativeJavaModuleName>
     <unix.common.lib.name>netty-unix-common</unix.common.lib.name>
     <unix.common.lib.dir>${project.build.directory}/unix-common-lib</unix.common.lib.dir>
     <unix.common.lib.unpacked.dir>${unix.common.lib.dir}/META-INF/native/lib</unix.common.lib.unpacked.dir>
@@ -37,6 +38,7 @@
     <jni.compiler.args.cflags>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -Wunused-variable -fvisibility=hidden -I${unix.common.include.unpacked.dir}</jni.compiler.args.cflags>
     <jni.compiler.args.ldflags>LDFLAGS=-L${unix.common.lib.unpacked.dir} -Wl,--no-as-needed -lrt -ldl -Wl,--whole-archive -l${unix.common.lib.name} -Wl,--no-whole-archive</jni.compiler.args.ldflags>
     <nativeSourceDirectory>${project.basedir}/src/main/c</nativeSourceDirectory>
+    <nativeOutputDirectory>${project.build.directory}/native-classes</nativeOutputDirectory>
     <skipTests>true</skipTests>
     <jniArch>${os.detected.arch}</jniArch>
     <jni.classifier>${os.detected.name}-${jniArch}</jni.classifier>
@@ -77,7 +79,10 @@
                   <target>
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-                    <copy todir="${project.build.outputDirectory}" includeEmptyDirs="false">
+                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
+                      <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**" />
+                    </copy>
+                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
                       <zipfileset dir="${nativeLibOnlyDir}/META-INF/native" />
                       <regexpmapper handledirsep="yes" from="^(?:[^/]+/)*([^/]+)$" to="META-INF/native/\1" />
                     </copy>
@@ -140,7 +145,15 @@
             <artifactId>module-info</artifactId>
             <executions>
               <execution>
-                <id>module-info</id>
+                <id>native-module-info</id>
+                <phase>process-classes</phase>
+                <configuration>
+                  <moduleName>${nativeJavaModuleName}</moduleName>
+                  <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+                </configuration>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>
@@ -154,6 +167,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>

@@ -29,7 +29,8 @@
   <properties>
     <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
-    <javaModuleName>io.netty.transport.epoll.${javaModuleNameClassifier}</javaModuleName>
+    <javaModuleName>io.netty.transport.epoll</javaModuleName>
+    <nativeJavaModuleName>${javaModuleName}.${javaModuleNameClassifier}</nativeJavaModuleName>
     <!-- Needed as we use SelfSignedCertificate in our tests -->
     <argLine.java9.extras>--add-exports java.base/sun.security.x509=ALL-UNNAMED</argLine.java9.extras>
     <!-- Always check JNI during test run so we catch bugs that could cause crashes -->
@@ -42,6 +43,7 @@
     <jni.compiler.args.ldflags>LDFLAGS=-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -Wl,--gc-sections -L${unix.common.lib.unpacked.dir}</jni.compiler.args.ldflags>
     <jni.compiler.args.libs>LIBS=-Wl,--whole-archive -l${unix.common.lib.name} -Wl,--no-whole-archive -ldl</jni.compiler.args.libs>
     <nativeSourceDirectory>${project.basedir}/src/main/c</nativeSourceDirectory>
+    <nativeOutputDirectory>${project.build.directory}/native-classes</nativeOutputDirectory>
     <skipTests>true</skipTests>
   </properties>
 
@@ -154,7 +156,7 @@
                 <configuration>
                   <name>netty_transport_native_epoll_${os.detected.arch}</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -174,15 +176,6 @@
             </executions>
           </plugin>
           <plugin>
-            <groupId>io.github.dmlloyd.module-info</groupId>
-            <artifactId>module-info</artifactId>
-            <executions>
-              <execution>
-                <id>module-info</id>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <executions>
               <!-- Generate the JAR that contains the native library in it. -->
@@ -192,6 +185,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -315,7 +309,7 @@
                 <configuration>
                   <name>netty_transport_native_epoll_aarch_64</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -346,6 +340,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -475,7 +470,7 @@
                 <configuration>
                   <name>netty_transport_native_epoll_riscv64</name>
                   <nativeSourceDirectory>${nativeSourceDirectory}</nativeSourceDirectory>
-                  <libDirectory>${project.build.outputDirectory}</libDirectory>
+                  <libDirectory>${nativeOutputDirectory}</libDirectory>
                   <!-- We use Maven's artifact classifier instead.
                        This hack will make the hawtjni plugin to put the native library
                        under 'META-INF/native' rather than 'META-INF/native/${platform}'. -->
@@ -506,6 +501,7 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
+                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -622,11 +618,42 @@
         </executions>
       </plugin>
       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resource-one</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${nativeOutputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.outputDirectory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>io.github.dmlloyd.module-info</groupId>
         <artifactId>module-info</artifactId>
         <executions>
           <execution>
             <id>module-info</id>
+          </execution>
+          <execution>
+            <id>native-module-info</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <moduleName>${nativeJavaModuleName}</moduleName>
+              <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>generate</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
