@@ -51,8 +51,8 @@ import static io.netty.handler.ssl.SslContextBuilder.forServer;
  *
  * <p>Running the server:
  * <ul>
- *     <li>./target/maven-jlink/default/bin/java -m
- *     io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</li>
+ *     <li>./target/maven-jlink/default/bin/java
+ *     -m io.netty.testsuite_jpms.main/io.netty.testsuite_jpms.main.HttpHelloWorldServer</li>
  *     <li>./target/maven-jlink/default/bin/http (shortcut)</li>
  * </ul>
  *

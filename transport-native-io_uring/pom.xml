@@ -68,9 +68,9 @@
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
-              <!-- Copy the native lib that was generated -->
+              <!-- Copy the native lib and the relevant default-jar content that was generated -->
               <execution>
-                <id>copy-native-lib</id>
+                <id>copy-to-native-output</id>
                 <phase>process-test-resources</phase>
                 <goals>
                   <goal>run</goal>
@@ -406,9 +406,6 @@
           <execution>
             <id>default-jar</id>
             <configuration>
-              <excludes>
-                <exclude>META-INF/native/**</exclude>
-              </excludes>
               <archive>
                 <manifest>
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>

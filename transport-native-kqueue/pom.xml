@@ -40,6 +40,28 @@
       <build>
         <plugins>
           <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <!-- Copy the relevant default-jar content that was generated -->
+              <execution>
+                <id>copy-to-native-output</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
+                      <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <!-- unpack the unix-common static library and include files -->
@@ -89,6 +111,24 @@
                 <goals>
                   <goal>generate</goal>
                   <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>io.github.dmlloyd.module-info</groupId>
+            <artifactId>module-info</artifactId>
+            <executions>
+              <execution>
+                <id>native-module-info</id>
+                <phase>process-classes</phase>
+                <configuration>
+                  <moduleName>${nativeJavaModuleName}</moduleName>
+                  <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+                </configuration>
+                <goals>
+                  <goal>generate</goal>
                 </goals>
               </execution>
             </executions>
@@ -344,6 +384,28 @@
       <build>
         <plugins>
           <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <!-- Copy the relevant default-jar content that was generated -->
+              <execution>
+                <id>copy-to-native-output</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
+                      <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <!-- unpack the unix-common static library and include files -->
@@ -390,6 +452,24 @@
                 <goals>
                   <goal>generate</goal>
                   <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>io.github.dmlloyd.module-info</groupId>
+            <artifactId>module-info</artifactId>
+            <executions>
+              <execution>
+                <id>native-module-info</id>
+                <phase>process-classes</phase>
+                <configuration>
+                  <moduleName>${nativeJavaModuleName}</moduleName>
+                  <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+                </configuration>
+                <goals>
+                  <goal>generate</goal>
                 </goals>
               </execution>
             </executions>
@@ -451,6 +531,28 @@
       <build>
         <plugins>
           <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <!-- Copy the relevant default-jar content that was generated -->
+              <execution>
+                <id>copy-to-native-output</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
+                      <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <!-- unpack the unix-common static library and include files -->
@@ -497,6 +599,24 @@
                 <goals>
                   <goal>generate</goal>
                   <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>io.github.dmlloyd.module-info</groupId>
+            <artifactId>module-info</artifactId>
+            <executions>
+              <execution>
+                <id>native-module-info</id>
+                <phase>process-classes</phase>
+                <configuration>
+                  <moduleName>${nativeJavaModuleName}</moduleName>
+                  <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
+                </configuration>
+                <goals>
+                  <goal>generate</goal>
                 </goals>
               </execution>
             </executions>
@@ -664,56 +784,11 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-resource-one</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${nativeOutputDirectory}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>${project.build.outputDirectory}</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>io.github.dmlloyd.module-info</groupId>
         <artifactId>module-info</artifactId>
         <executions>
           <execution>
             <id>module-info</id>
-          </execution>
-          <execution>
-            <id>native-module-info</id>
-            <phase>process-classes</phase>
-            <configuration>
-              <moduleName>${nativeJavaModuleName}</moduleName>
-              <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
-            </configuration>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <!-- Generate the fallback JAR that does not contain the native library. -->
-          <execution>
-            <id>default-jar</id>
-            <configuration>
-              <excludes>
-                <exclude>META-INF/native/**</exclude>
-              </excludes>
-            </configuration>
           </execution>
         </executions>
       </plugin>
