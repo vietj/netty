@@ -27,10 +27,9 @@
   <packaging>jar</packaging>
 
   <properties>
-    <multiReleaseJar>true</multiReleaseJar>
     <javaModuleNameClassifier>${os.detected.name}.${os.detected.arch}</javaModuleNameClassifier>
-    <javaModuleName>io.netty.transport.io_uring</javaModuleName>
-    <nativeJavaModuleName>${javaModuleName}.${javaModuleNameClassifier}</nativeJavaModuleName>
+    <fallbackModuleName>io.netty.transport.io_uring</fallbackModuleName>
+    <javaModuleName>${fallbackModuleName}.${javaModuleNameClassifier}</javaModuleName>
     <unix.common.lib.name>netty-unix-common</unix.common.lib.name>
     <unix.common.lib.dir>${project.build.directory}/unix-common-lib</unix.common.lib.dir>
     <unix.common.lib.unpacked.dir>${unix.common.lib.dir}/META-INF/native/lib</unix.common.lib.unpacked.dir>
@@ -38,7 +37,7 @@
     <jni.compiler.args.cflags>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -Wunused-variable -fvisibility=hidden -I${unix.common.include.unpacked.dir}</jni.compiler.args.cflags>
     <jni.compiler.args.ldflags>LDFLAGS=-L${unix.common.lib.unpacked.dir} -Wl,--no-as-needed -lrt -ldl -Wl,--whole-archive -l${unix.common.lib.name} -Wl,--no-whole-archive</jni.compiler.args.ldflags>
     <nativeSourceDirectory>${project.basedir}/src/main/c</nativeSourceDirectory>
-    <nativeOutputDirectory>${project.build.directory}/native-classes</nativeOutputDirectory>
+    <fallbackOutputDirectory>${project.build.directory}/fallback-classes</fallbackOutputDirectory>
     <skipTests>true</skipTests>
     <jniArch>${os.detected.arch}</jniArch>
     <jni.classifier>${os.detected.name}-${jniArch}</jni.classifier>
@@ -68,9 +67,9 @@
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
-              <!-- Copy the native lib and the relevant default-jar content that was generated -->
+              <!-- Copy the native lib that was generated -->
               <execution>
-                <id>copy-to-native-output</id>
+                <id>copy-native-lib</id>
                 <phase>process-test-resources</phase>
                 <goals>
                   <goal>run</goal>
@@ -79,10 +78,7 @@
                   <target>
                     <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
-                      <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**" />
-                    </copy>
-                    <copy todir="${nativeOutputDirectory}" includeEmptyDirs="false">
+                    <copy todir="${project.build.outputDirectory}" includeEmptyDirs="false">
                       <zipfileset dir="${nativeLibOnlyDir}/META-INF/native" />
                       <regexpmapper handledirsep="yes" from="^(?:[^/]+/)*([^/]+)$" to="META-INF/native/\1" />
                     </copy>
@@ -141,23 +137,6 @@
             </executions>
           </plugin>
           <plugin>
-            <groupId>io.github.dmlloyd.module-info</groupId>
-            <artifactId>module-info</artifactId>
-            <executions>
-              <execution>
-                <id>native-module-info</id>
-                <phase>process-classes</phase>
-                <configuration>
-                  <moduleName>${nativeJavaModuleName}</moduleName>
-                  <outputDirectory>${nativeOutputDirectory}/META-INF/versions/11/</outputDirectory>
-                </configuration>
-                <goals>
-                  <goal>generate</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
             <artifactId>maven-jar-plugin</artifactId>
             <executions>
               <!-- Generate the JAR that contains the native library in it. -->
@@ -167,7 +146,6 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
-                  <classesDirectory>${nativeOutputDirectory}</classesDirectory>
                   <archive>
                     <manifest>
                       <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -397,6 +375,17 @@
           <execution>
             <id>module-info</id>
           </execution>
+          <execution>
+            <id>fallback-module-info</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <moduleName>${fallbackModuleName}</moduleName>
+              <outputDirectory>${fallbackOutputDirectory}/META-INF/versions/11/</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -406,6 +395,7 @@
           <execution>
             <id>default-jar</id>
             <configuration>
+              <classesDirectory>${fallbackOutputDirectory}</classesDirectory>
               <archive>
                 <manifest>
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -425,6 +415,24 @@
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
+          <!-- Copy files for the fallback JAR that does not contain the native library
+               and a different module declaration -->
+          <execution>
+            <id>copy-to-native-output</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+                <copy todir="${fallbackOutputDirectory}" includeEmptyDirs="false">
+                  <zipfileset dir="${project.build.outputDirectory}" excludes="META-INF/versions/**,META-INF/native/**" />
+                </copy>
+              </target>
+            </configuration>
+          </execution>
           <!-- Copy the manifest file that we populated so far so we can use it as a starting point when generating the jars and adding more things to it. -->
           <execution>
             <id>copy-manifest</id>
