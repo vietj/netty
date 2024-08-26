@@ -15,9 +15,12 @@
  */
 package io.netty.testsuite_jpms.test;
 
+import io.netty.bootstrap.ChannelInitializerExtension;
 import org.junit.jupiter.api.Test;
 
+import java.lang.module.ModuleDescriptor;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +34,7 @@ public class CheckModuleDescriptorTest {
      * Ensure that classpath is empty and all module are named and not automatic.
      */
     @Test
-    public void checkModules() {
+    public void checkExplicitModules() {
         String classpath = System.getProperty("java.class.path");
         assertEquals("", classpath);
         ModuleLayer layer = ModuleLayer.boot();
@@ -44,4 +47,16 @@ public class CheckModuleDescriptorTest {
             }
         });
     }
+
+    @Test
+    public void testTransportChannelInitializerExtensionUseDeclaration() {
+        Optional<Module> opt = ModuleLayer.boot().findModule("io.netty.transport");
+        assertTrue(opt.isPresent());
+        Module module = opt.get();
+        Set<String> providesSet = module.getDescriptor().uses();
+        assertEquals(1, providesSet.size());
+        String use = providesSet.iterator().next();
+        assertEquals(ChannelInitializerExtension.class.getName(), use);
+    }
+
 }
