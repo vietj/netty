@@ -15,7 +15,9 @@
  */
 package io.netty.testsuite_jpms.test.jfr;
 
+import io.netty.buffer.AdaptiveByteBufAllocator;
 import io.netty.buffer.AllocateChunkEvent;
+import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.PlatformDependent;
 import jdk.jfr.Recording;
 import jdk.jfr.consumer.RecordedEvent;
@@ -65,16 +67,17 @@ public class FlightRecorderTest {
     @Test
     public void testAdaptiveAllocatorEvent()  throws InterruptedException {
         startRecording("AllocateChunkEvent");
-        AllocateChunkEvent expected = new AllocateChunkEvent();
-        expected.direct = true;
-        expected.capacity = 16;
-        expected.commit();
+//        AllocateChunkEvent expected = new AllocateChunkEvent();
+//        expected.direct = true;
+//        expected.capacity = 16;
+//        expected.commit();
+        ByteBuf byteBuf = AdaptiveByteBufAllocator.DEFAULT.buffer();
+        byteBuf.release();
         Deque<RecordedEvent> events = stopRecord();
         assertEquals(1, events.size());
         boolean found = false;
         for  (RecordedEvent event; !found && (event = events.poll()) != null;) {
-            if (event.getEventType().getName().equals("AllocateChunkEvent") && event.getBoolean("direct")
-                    && event.getInt("capacity") == 16) {
+            if (event.getEventType().getName().equals("AllocateChunkEvent") && event.getBoolean("direct")) {
                 found = true;
             }
         }
